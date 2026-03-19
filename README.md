@@ -24,10 +24,9 @@ npm run dev
 ## 📁 Estrutura de pastas
 
 ```
-sibradanca/
-├── public/          → Arquivos estáticos
-├── src/             → Código-fonte
-├── docs/            → Documentação técnica
+ondance/
+├── frontend/          → Código-fonte do frontend (Vuejs/Quasar)
+├── backend/           → Código-fonte do backend (Python/Django)
 ├── README.md           ← o arquivo do projeto
 ├── CONTRIBUTING.md     ← o arquivo de contribuição
 └── .github/
@@ -35,11 +34,12 @@ sibradanca/
     │   ├── bug_report.md
     │   └── feature_request.md
     └── PULL_REQUEST_TEMPLATE.md
+└── .gitignore/
 ```
 
 ## 👥 Squad responsável
 Time: `squad-ondance`
-Líder: @nick-do-lider
+Líder: @luciano_martins
 
 ## 📌 Links úteis
 - [Tarefas no Asana](#)
