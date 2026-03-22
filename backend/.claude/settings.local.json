@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find /e/atados/ondance/frontend/src -type f \\\\\\(-name *store* -o -name *mock* -o -name *fixture* -o -name *api* -o -name axios* \\\\\\))"
+    ]
+  }
+}

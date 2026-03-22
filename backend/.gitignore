@@ -1,0 +1,5 @@
+*.iml
+*.sqlite3
+*.xml
+.idea/
+.env
