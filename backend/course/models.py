@@ -31,7 +31,7 @@ class UserCourse(models.Model):
     is_completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Progresso de {self.profile.user.name} em {self.course.title}"
+        return f"Progresso de {self.profile.name} em {self.course.title}"
 
     class Meta:
         verbose_name = "Progresso"

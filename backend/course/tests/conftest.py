@@ -25,7 +25,7 @@ def teacher(db):
 
 @pytest.fixture
 def student(db):
-    return User.objects.create_user(email='aluno@teste.com', password='senha123', name='Aluno Teste')
+    return User.objects.create_user(email='aluno@teste.com', password='senha123')
 
 
 @pytest.fixture
