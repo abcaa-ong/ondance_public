@@ -1,7 +1,16 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# from user.models import User, City, State
+from user.models import City, Profile, State, User
 
-# admin.site.register(User)
-# admin.site.register(City)
-# admin.site.register(State)
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    list_display = ("name", "state")
+    list_filter = ("state",)
+    ordering = ("name",)
+    search_fields = ("name",)
+
+
+admin.site.register(User)
+admin.site.register(State)
+admin.site.register(Profile)
