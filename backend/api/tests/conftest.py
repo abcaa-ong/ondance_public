@@ -1,56 +1,39 @@
 import pytest
 from rest_framework.test import APIClient
 
-# conftest.py
+from user.models import City, State
+
+
 @pytest.fixture
 def api_client():
-    return APIClient
+    return APIClient()
 
-# from backend.models import Planeta, Filme
-# from rest_framework.test import APIClient
-# from rest_framework.authtoken.models import Token
-#
-# from django.contrib.auth import get_user_model
-#
-# @pytest.fixture
-# def planeta(db):
-#     return Planeta.objects.create(
-#         nome="Saturno",
-#         clima="Nebuloso",
-#         diametro=1233221,
-#         populacao=1000000000
-#     )
-#
-# @pytest.fixture
-# def filme(db, planeta):
-#     return Filme.objects.create(
-#         nome="Um passo para humanidade",
-#         data_lancamento="1983-11-23",
-#         planetas=planeta
-#     )
-#
-# planets = [
-#         [Planeta(nome='Kamino', clima="temperate", diametro=19720, populacao=1000000000)],
-#         [Planeta(nome='Coruscant', clima='temperate', diametro=12240, populacao=1000000000)],
-#         [Planeta(nome='Naboo', clima='temperate', diametro=12120, populacao=4500000000)],
-#         [Planeta(nome='Endor', clima='temperate', diametro=4900, populacao=30000000)],
-#         [Planeta(nome='Bespin', clima='temperate', diametro=118000, populacao=6000000)],
-#         [Planeta(nome='Dagobah', clima='murky', diametro=8900, populacao=0)]
-#     ]
-# @pytest.fixture(params=planets)
-# def planetas(request):
-#     return request.param
-#
-#
-# @pytest.fixture
-# def create_user(db):
-#     email = 'foo@email.com'
-#     password = 'bar'
-#     return get_user_model().objects.create_user(email=email, password=password)
-#
-# @pytest.fixture
-# def api_client(create_user):
-#     token = Token.objects.create(user=create_user)
-#     core = APIClient()
-#     core.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
-#     return core
+
+@pytest.fixture
+def state(db):
+    return State.objects.create(name='São Paulo', abbreviation='SP')
+
+
+@pytest.fixture
+def state_rj(db):
+    return State.objects.create(name='Rio de Janeiro', abbreviation='RJ')
+
+
+@pytest.fixture
+def cities(state, state_rj):
+    City.objects.create(name='Campinas', state=state)
+    City.objects.create(name='São Paulo', state=state)
+    City.objects.create(name='Rio de Janeiro', state=state_rj)
+
+
+@pytest.fixture
+def states_3(db):
+    State.objects.create(name='São Paulo', abbreviation='SP')
+    State.objects.create(name='Rio de Janeiro', abbreviation='RJ')
+    State.objects.create(name='Minas Gerais', abbreviation='MG')
+
+
+@pytest.fixture
+def cities_10(state):
+    for i in range(12):
+        City.objects.create(name=f'Cidade {i:02d}', state=state)
