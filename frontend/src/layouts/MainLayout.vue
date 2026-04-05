@@ -13,6 +13,27 @@
         <q-toolbar-title>
           On Dance
         </q-toolbar-title>
+        
+        <!-- Spacer to push link to the right -->
+        <div style="flex: 1;" />
+        
+        <!-- Cadastro Link -->
+        <router-link
+          to="/register"
+          style="
+            color: var(--od-text-1, #333);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+          "
+          @mouseenter="e => e.target.style.backgroundColor = 'var(--od-bg-subtle, #f5f5f5)'"
+          @mouseleave="e => e.target.style.backgroundColor = 'transparent'"
+        >
+          Cadastro
+        </router-link>
       </q-toolbar>
     </q-header>
 

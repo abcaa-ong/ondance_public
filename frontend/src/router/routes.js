@@ -28,6 +28,24 @@ const coursesRoutes = {
   ]
 }
 
+const loginRoutes = {
+  path: '/login',
+  component: () => import('layouts/MainLayout.vue'),
+  meta: { guest: true },
+  children: [
+    { path: '', name: 'login', component: () => import('pages/LoginPage.vue') }
+  ]
+}
+
+const registerRoutes = {
+  path: '/register',
+  component: () => import('layouts/MainLayout.vue'),
+  meta: { guest: true },
+  children: [
+    { path: '', name: 'register', component: () => import('pages/RegisterPage.vue') }
+  ]
+}
+
 const citiesRoutes = {
   path: '/cities',
   component: () => import('layouts/CoursesLayout.vue'),
@@ -83,6 +101,8 @@ const routes = [
   studentRoutes,
   coursesRoutes,
   citiesRoutes,
+  loginRoutes,
+  registerRoutes,
   // professorRoutes,
   // adminRoutes,
   mainRoutes,

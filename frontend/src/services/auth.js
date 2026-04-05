@@ -5,6 +5,10 @@ export const authService = {
     return api.post('/token/', credentials)
   },
 
+  register(userData) {
+    return api.post('/register/', userData)
+  },
+
   refresh(refreshToken) {
     return api.post('/token/refresh/', { refresh: refreshToken })
   },
