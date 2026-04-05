@@ -42,8 +42,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     name = models.CharField(max_length=255)
     photo = models.ImageField(upload_to='profiles/', null=True, blank=True)
-    city = models.ForeignKey('City', on_delete=models.PROTECT)
-    celular = models.CharField(max_length=20)
+    city = models.ForeignKey('City', on_delete=models.PROTECT, null=True, blank=True)
+    celular = models.CharField(max_length=20, null=True, blank=True)
     telephone = models.CharField(max_length=20, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
 
