@@ -7,26 +7,14 @@ from user.models import City, Profile, State, User
 
 class UserSerializer(serializers.ModelSerializer):
     MIN_PASSWORD_LENGTH = 8
-    name = serializers.CharField(write_only=True)
-    city = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.all(),
-        required=False,
-        allow_null=True,
-        write_only=True,
-    )
-    celular = serializers.CharField(required=False, allow_blank=True, write_only=True)
 
     class Meta:
         model = User
-        fields = [
-            'id',
-            'email',
-            'password',
-            'name',
-            'city',
-            'celular',
-        ]
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['id', 'email', 'password']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'email': {'validators': []},  # validate_email trata unicidade com mensagem em PT
+        }
 
     def validate_email(self, value):
         if User.objects.filter(email__iexact=value).exists():
@@ -42,20 +30,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        name = validated_data.pop('name')
-        city = validated_data.pop('city', None)
-        celular = validated_data.pop('celular', '')
-
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
         )
-        Profile.objects.create(
-            user=user,
-            name=name,
-            city=city,
-            celular=celular or None,
-        )
+        Profile.objects.create(user=user)
         return user
 
 

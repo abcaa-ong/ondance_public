@@ -9,6 +9,7 @@ from api.serializers import (
     StateSerializer,
     UserSerializer,
 )
+from api.throttles import RegisterThrottle
 from course.models import Course
 from user.models import City, State, User
 
@@ -20,9 +21,10 @@ class UserList(generics.ListAPIView):
 users = UserList.as_view()
 
 
-class UserCreate(generics.ListCreateAPIView):
+class UserCreate(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    throttle_classes = [RegisterThrottle]
 
 create_user = UserCreate.as_view()
 
