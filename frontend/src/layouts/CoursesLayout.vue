@@ -18,6 +18,14 @@
           >
             <q-tooltip>{{ isDark ? 'Modo claro' : 'Modo escuro' }}</q-tooltip>
           </q-btn>
+          <q-btn
+            flat round dense
+            icon="logout"
+            :style="{ color: 'var(--od-text-3)' }"
+            @click="handleLogout"
+          >
+            <q-tooltip>Sair</q-tooltip>
+          </q-btn>
         </div>
       </q-toolbar>
     </q-header>
@@ -42,13 +50,22 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AppSidebar from 'components/shared/AppSidebar.vue'
 import { useDarkMode } from 'src/composables/useDarkMode'
+import { useAuth } from 'src/composables/useAuth'
 
 const drawerOpen = ref(true)
 function toggleDrawer () { drawerOpen.value = !drawerOpen.value }
 
 const { isDark, toggle: toggleDark } = useDarkMode()
+const { logout } = useAuth()
+const router = useRouter()
+
+function handleLogout () {
+  logout()
+  router.push('/login')
+}
 
 const navSections = [
   {
