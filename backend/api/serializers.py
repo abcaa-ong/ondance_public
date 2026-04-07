@@ -1,3 +1,6 @@
+import requests as http_requests
+
+from django.conf import settings
 from django.db import transaction
 from rest_framework import serializers
 
@@ -87,6 +90,49 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = ['id', 'title', 'teacher', 'is_published', 'status']
         read_only_fields = ['id', 'is_published', 'status']
+
+
+GOOGLE_TOKENINFO_URL = 'https://oauth2.googleapis.com/tokeninfo'
+
+
+class GoogleSocialAuthSerializer(serializers.Serializer):
+    credential = serializers.CharField(write_only=True)
+
+    def validate_credential(self, value):
+        try:
+            resp = http_requests.get(
+                GOOGLE_TOKENINFO_URL,
+                params={'id_token': value},
+                timeout=5,
+            )
+        except http_requests.RequestException:
+            raise serializers.ValidationError(
+                'Não foi possível verificar o token com o Google.'
+            )
+
+        if resp.status_code != 200:
+            raise serializers.ValidationError(
+                'Token do Google inválido ou expirado.'
+            )
+
+        id_info = resp.json()
+
+        if id_info.get('aud') != settings.GOOGLE_CLIENT_ID:
+            raise serializers.ValidationError(
+                'Token não autorizado para esta aplicação.'
+            )
+
+        if id_info.get('email_verified') != 'true':
+            raise serializers.ValidationError(
+                'E-mail da conta Google não verificado.'
+            )
+
+        if not id_info.get('email'):
+            raise serializers.ValidationError(
+                'Não foi possível obter o e-mail da conta Google.'
+            )
+
+        return id_info
 
 
 # class ClientSerializer(serializers.ModelSerializer):

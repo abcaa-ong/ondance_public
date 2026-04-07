@@ -10,6 +10,7 @@ API_KEY_CHAT_GPT=
 OPENAI_API_KEY=
 ORG_ID=
 DATABASE_URL=postgres://postgres:postgres@localhost/postgres
+GOOGLE_CLIENT_ID=
 
 # Email Configuration
 EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend

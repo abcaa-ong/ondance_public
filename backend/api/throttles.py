@@ -7,3 +7,7 @@ class RegisterThrottle(AnonRateThrottle):
 
 class TokenThrottle(AnonRateThrottle):
     scope = 'token'
+
+
+class SocialAuthThrottle(AnonRateThrottle):
+    scope = 'social_auth'
