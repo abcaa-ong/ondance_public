@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import generics, permissions, status
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -10,6 +11,7 @@ from api.serializers import (
     CourseSerializer,
     GoogleSocialAuthSerializer,
     PasswordChangeSerializer,
+    ProfileSerializer,
     StateSerializer,
     UserSerializer,
 )
@@ -88,6 +90,7 @@ password_change = PasswordChangeView.as_view()
 class GoogleSocialAuthView(APIView):
     throttle_classes = [SocialAuthThrottle]
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
     @transaction.atomic
     def post(self, request):
@@ -120,9 +123,39 @@ class GoogleSocialAuthView(APIView):
 
         refresh = RefreshToken.for_user(user)
         return Response(
-            {'refresh': str(refresh), 'access': str(refresh.access_token)},
+            {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'profile_complete': bool(user.profile.celular),
+            },
             status=status.HTTP_200_OK,
         )
 
 
 google_social_auth = GoogleSocialAuthView.as_view()
+
+
+class ProfileView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, JSONParser]
+
+    def get(self, request):
+        serializer = ProfileSerializer(request.user.profile, context={'request': request})
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = ProfileSerializer(
+            request.user.profile,
+            data=request.data,
+            partial=True,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            **serializer.data,
+            'profile_complete': bool(serializer.instance.celular),
+        })
+
+
+profile_view = ProfileView.as_view()

@@ -92,6 +92,23 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'is_published', 'status']
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+    city_detail = CitySerializer(source='city', read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['email', 'name', 'photo', 'celular', 'telephone', 'birthday', 'city', 'city_detail']
+        extra_kwargs = {
+            'city': {'required': False, 'allow_null': True},
+            'photo': {'required': False, 'allow_null': True},
+            'celular': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'telephone': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'birthday': {'required': False, 'allow_null': True},
+            'name': {'required': False},
+        }
+
+
 GOOGLE_TOKENINFO_URL = 'https://oauth2.googleapis.com/tokeninfo'
 
 
