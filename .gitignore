@@ -3,4 +3,6 @@ backend/__pycache__/
 backend/.coverage
 backend/.claude/
 frontend/.claude/
+.claude/settings.local.json
+backend/media/
 CLAUDE.md
