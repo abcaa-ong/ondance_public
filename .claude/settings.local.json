@@ -2,7 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(find /e/atados/ondance/frontend/src/pages -name \"*.vue\" -exec wc -l {} +)",
-      "Skill(commit)"
+      "Skill(commit)",
+      "Bash(grep -E \"\\\\.py$\")",
+      "Bash(python -m pytest api/tests/test_courses.py api/tests/test_profile.py -v --no-header)",
+      "Bash(.venv/Scripts/python.exe -m pytest api/tests/test_courses.py api/tests/test_profile.py -v --no-header)",
+      "Bash(.venv/Scripts/python.exe -m pytest --no-header -q)",
+      "Skill(pytest)",
+      "Bash(.venv/Scripts/task test:*)",
+      "Bash(.venv/Scripts/task.exe test:*)",
+      "Bash(.venv/Scripts/python.exe -m taskipy.cli test)",
+      "Bash(.venv/Scripts/python.exe -c \"import taskipy; print\\(taskipy.__file__\\)\")",
+      "Bash(.venv/Scripts/python.exe -m taskipy.task test)",
+      "Bash(.venv/Scripts/ruff.exe check:*)",
+      "Bash(.venv/Scripts/pytest.exe -s -x -vv --cov=user --cov=course --cov=api -p no:cacheprovider)",
+      "Bash(npx claude-code-templates@latest:*)"
     ]
   }
 }
