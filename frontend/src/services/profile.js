@@ -6,6 +6,9 @@ export const profileService = {
   },
 
   update(data) {
-    return api.patch('/profile/', data)
+    const isFormData = data instanceof FormData
+    return api.patch('/profile/', data, {
+      headers: isFormData ? { 'Content-Type': undefined } : {},
+    })
   },
 }
