@@ -1,4 +1,3 @@
-import { authService } from 'src/services/auth'
 import { useAuth } from 'src/composables/useAuth'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -17,7 +16,7 @@ function loadGoogleSdk() {
 }
 
 export function useGoogleAuth() {
-  const { saveTokens } = useAuth()
+  const { googleLogin } = useAuth()
 
   function renderFallbackButton(elementId) {
     const el = document.getElementById(elementId)
@@ -53,9 +52,7 @@ export function useGoogleAuth() {
       client_id: CLIENT_ID,
       callback: async ({ credential }) => {
         try {
-          const response = await authService.googleLogin(credential)
-          saveTokens(response.data)
-          localStorage.setItem('profile_complete', response.data.profile_complete ? 'true' : 'false')
+          const response = await googleLogin(credential)
           onSuccess?.(response)
         } catch (error) {
           onError?.(error)

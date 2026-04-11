@@ -1,8 +1,13 @@
 import { computed, ref } from 'vue'
 import { authService } from 'src/services/auth'
 
-const accessToken = ref(localStorage.getItem('access_token') || '')
-const refreshToken = ref(localStorage.getItem('refresh_token') || '')
+const ACCESS_TOKEN_KEY = 'access_token'
+const REFRESH_TOKEN_KEY = 'refresh_token'
+const PROFILE_COMPLETE_KEY = 'profile_complete'
+
+const accessToken = ref(localStorage.getItem(ACCESS_TOKEN_KEY) || '')
+const refreshToken = ref(localStorage.getItem(REFRESH_TOKEN_KEY) || '')
+const profileComplete = ref(localStorage.getItem(PROFILE_COMPLETE_KEY) === 'true')
 
 function parseJwt(token) {
   if (!token) return null
@@ -25,26 +30,33 @@ function parseJwt(token) {
 const user = computed(() => parseJwt(accessToken.value))
 const isAuthenticated = computed(() => !!accessToken.value)
 
-function saveTokens(tokens = {}) {
-  const access = tokens.access ?? tokens.access_token ?? ''
-  const refresh = tokens.refresh ?? tokens.refresh_token ?? ''
+function saveTokens(data = {}) {
+  const access = data.access ?? data.access_token ?? ''
+  const refresh = data.refresh ?? data.refresh_token ?? ''
 
   if (access) {
     accessToken.value = access
-    localStorage.setItem('access_token', access)
+    localStorage.setItem(ACCESS_TOKEN_KEY, access)
   }
 
   if (refresh) {
     refreshToken.value = refresh
-    localStorage.setItem('refresh_token', refresh)
+    localStorage.setItem(REFRESH_TOKEN_KEY, refresh)
+  }
+
+  if (data.profile_complete !== undefined) {
+    profileComplete.value = !!data.profile_complete
+    localStorage.setItem(PROFILE_COMPLETE_KEY, data.profile_complete ? 'true' : 'false')
   }
 }
 
 function clearTokens() {
   accessToken.value = ''
   refreshToken.value = ''
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
+  profileComplete.value = false
+  localStorage.removeItem(ACCESS_TOKEN_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_KEY)
+  localStorage.removeItem(PROFILE_COMPLETE_KEY)
 }
 
 async function login(credentials) {
@@ -53,19 +65,24 @@ async function login(credentials) {
   return response
 }
 
+async function googleLogin(credential) {
+  const response = await authService.googleLogin(credential)
+  saveTokens(response.data)
+  return response
+}
+
 async function logout() {
-  authService.logout()
   clearTokens()
 }
 
 async function refresh() {
-  const refreshTokenValue = refreshToken.value || localStorage.getItem('refresh_token')
-  if (!refreshTokenValue) {
+  const token = refreshToken.value || localStorage.getItem(REFRESH_TOKEN_KEY)
+  if (!token) {
     clearTokens()
     return null
   }
 
-  const response = await authService.refresh(refreshTokenValue)
+  const response = await authService.refresh(token)
   saveTokens(response.data)
   return response
 }
@@ -76,10 +93,12 @@ export function useAuth() {
     user,
     accessToken,
     refreshToken,
+    profileComplete,
     login,
+    googleLogin,
     logout,
     refresh,
     clearTokens,
-    saveTokens
+    saveTokens,
   }
 }
