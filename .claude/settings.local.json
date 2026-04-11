@@ -15,7 +15,11 @@
       "Bash(.venv/Scripts/python.exe -m taskipy.task test)",
       "Bash(.venv/Scripts/ruff.exe check:*)",
       "Bash(.venv/Scripts/pytest.exe -s -x -vv --cov=user --cov=course --cov=api -p no:cacheprovider)",
-      "Bash(npx claude-code-templates@latest:*)"
+      "Bash(npx claude-code-templates@latest:*)",
+      "Bash(xargs wc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(.venv/Scripts/pytest.exe api/tests/test_profile.py -v)"
     ]
   }
 }
