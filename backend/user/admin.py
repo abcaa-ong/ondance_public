@@ -13,4 +13,11 @@ class CityAdmin(admin.ModelAdmin):
 
 admin.site.register(User)
 admin.site.register(State)
-admin.site.register(Profile)
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "user", "name", "celular", "birthday", "city",)
+    # list_filter = ("user",)
+    ordering = ("user",)
+    search_fields = ("name",)
