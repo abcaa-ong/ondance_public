@@ -84,6 +84,13 @@ import { useQuasar } from 'quasar'
 import { useAuth } from 'src/composables/useAuth'
 import { useGoogleAuth } from 'src/composables/useGoogleAuth'
 
+function extractApiError(error, fallback = 'Erro inesperado. Tente novamente.') {
+  const data = error.response?.data
+  if (!data) return fallback
+  const messages = [...new Set(Object.values(data).flat())]
+  return messages.length ? messages.join(' ') : fallback
+}
+
 const router = useRouter()
 const $q = useQuasar()
 const { login } = useAuth()
@@ -124,7 +131,7 @@ async function handleLogin() {
 
     router.push('/courses/initial')
   } catch (error) {
-    errorMessage.value = error.response?.data?.message || 'Erro ao efetuar login.'
+    errorMessage.value = extractApiError(error, 'Erro ao efetuar login.')
   } finally {
     loading.value = false
   }
@@ -182,17 +189,14 @@ async function handleLogin() {
 
 .login-btn {
   width: 100%;
-  background: #4db8a8;
+  background: var(--od-accent);
   color: #fff;
   border-radius: 16px;
   padding: 14px 0;
   font-weight: 700;
-  box-shadow: 0 10px 20px rgba(77, 184, 168, 0.22);
+  box-shadow: 0 10px 20px rgba(123, 94, 167, 0.22);
 }
 
-.login-btn:hover {
-  background: #3aa08d;
-}
 
 .google-divider {
   display: flex;
@@ -220,12 +224,12 @@ async function handleLogin() {
 .signup-footer {
   margin-top: 18px;
   text-align: center;
-  color: #63777d;
+  color: var(--od-text-3);
   font-size: 13px;
 }
 
 .signup-link {
-  color: #4db8a8;
+  color: var(--od-accent);
   margin-left: 6px;
   text-decoration: none;
   font-weight: 700;
@@ -253,6 +257,6 @@ async function handleLogin() {
 }
 
 :deep(.login-input .q-field__border) {
-  border-color: rgba(77, 184, 168, 0.3) !important;
+  border-color: rgba(123, 94, 167, 0.3) !important;
 }
 </style>

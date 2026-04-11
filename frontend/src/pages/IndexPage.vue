@@ -31,71 +31,89 @@
 
         <!-- Formulário de cadastro -->
         <div id="signup-form" class="signup-card">
-          <h2 class="signup-title">Crie sua conta grátis</h2>
-          <p class="signup-sub">Comece a aprender hoje mesmo</p>
 
-          <q-form @submit.prevent="handleQuickSignup" class="signup-form">
-            <q-input
-              v-model="quickForm.email"
-              outlined
-              type="email"
-              label="E-mail"
-              class="form-input"
-              :rules="[
-                val => !!val || 'Campo obrigatório',
-                val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'E-mail inválido'
-              ]"
-            >
-              <template #prepend>
-                <q-icon name="mail_outline" size="18px" />
-              </template>
-            </q-input>
-
-            <q-input
-              v-model="quickForm.password"
-              outlined
-              :type="showPassword ? 'text' : 'password'"
-              label="Senha"
-              hint="Mínimo 8 caracteres"
-              class="form-input"
-              :rules="[
-                val => !!val || 'Campo obrigatório',
-                val => val.length >= 8 || 'Mínimo 8 caracteres'
-              ]"
-            >
-              <template #prepend>
-                <q-icon name="lock_outline" size="18px" />
-              </template>
-              <template #append>
-                <q-icon
-                  :name="showPassword ? 'visibility' : 'visibility_off'"
-                  size="18px"
-                  class="cursor-pointer"
-                  @click="showPassword = !showPassword"
-                />
-              </template>
-            </q-input>
-
-            <q-btn
-              unelevated
-              no-caps
-              type="submit"
-              label="Cadastrar"
-              class="signup-btn"
-              :loading="signingUp"
-            />
-          </q-form>
-
-          <div class="divider">
-            <span>ou continue com</span>
+          <!-- Estado: confirmação após cadastro -->
+          <div v-if="signupDone" class="signup-confirmation">
+            <div class="signup-confirm-icon">✉️</div>
+            <h2 class="signup-title">Verifique seu email</h2>
+            <p class="signup-sub">Enviamos um link de confirmação para:</p>
+            <div class="signup-confirm-email">{{ confirmedEmail }}</div>
+            <ol class="signup-confirm-steps">
+              <li>Abra seu email</li>
+              <li>Clique no link de confirmação</li>
+              <li>Você será redirecionado para completar o cadastro</li>
+            </ol>
+            <router-link to="/login" class="footer-link">Ir para o login →</router-link>
           </div>
 
-          <div id="google-signup-btn" class="google-btn-wrapper" />
+          <!-- Estado: formulário -->
+          <template v-else>
+            <h2 class="signup-title">Crie sua conta grátis</h2>
+            <p class="signup-sub">Comece a aprender hoje mesmo</p>
 
-          <p class="form-footer">
-            Já tem conta?
-            <router-link to="/login" class="footer-link">Entrar</router-link>
-          </p>
+            <q-form @submit.prevent="handleQuickSignup" class="signup-form">
+              <q-input
+                v-model="quickForm.email"
+                outlined
+                type="email"
+                label="E-mail"
+                class="form-input"
+                :rules="[
+                  val => !!val || 'Campo obrigatório',
+                  val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'E-mail inválido'
+                ]"
+              >
+                <template #prepend>
+                  <q-icon name="mail_outline" size="18px" />
+                </template>
+              </q-input>
+
+              <q-input
+                v-model="quickForm.password"
+                outlined
+                :type="showPassword ? 'text' : 'password'"
+                label="Senha"
+                hint="Mínimo 8 caracteres"
+                class="form-input"
+                :rules="[
+                  val => !!val || 'Campo obrigatório',
+                  val => val.length >= 8 || 'Mínimo 8 caracteres'
+                ]"
+              >
+                <template #prepend>
+                  <q-icon name="lock_outline" size="18px" />
+                </template>
+                <template #append>
+                  <q-icon
+                    :name="showPassword ? 'visibility' : 'visibility_off'"
+                    size="18px"
+                    class="cursor-pointer"
+                    @click="showPassword = !showPassword"
+                  />
+                </template>
+              </q-input>
+
+              <q-btn
+                unelevated
+                no-caps
+                type="submit"
+                label="Cadastrar"
+                class="signup-btn"
+                :loading="signingUp"
+              />
+            </q-form>
+
+            <div class="divider">
+              <span>ou continue com</span>
+            </div>
+
+            <div id="google-signup-btn" class="google-btn-wrapper" />
+
+            <p class="form-footer">
+              Já tem conta?
+              <router-link to="/login" class="footer-link">Entrar</router-link>
+            </p>
+          </template>
         </div>
 
       </div>
@@ -281,6 +299,8 @@ onMounted(() => {
 const quickForm = ref({ email: '', password: '' })
 const showPassword = ref(false)
 const signingUp = ref(false)
+const signupDone = ref(false)
+const confirmedEmail = ref('')
 
 function scrollToSignup() {
   const el = document.getElementById('signup-form')
@@ -297,11 +317,12 @@ function extractApiError(error, fallback = 'Erro inesperado. Tente novamente.') 
 async function handleQuickSignup() {
   signingUp.value = true
   try {
+    confirmedEmail.value = quickForm.value.email
     await authService.register({
       email: quickForm.value.email,
       password: quickForm.value.password,
     })
-    $q.notify({ type: 'positive', message: 'Cadastro realizado! Verifique seu email.', position: 'top' })
+    signupDone.value = true
     quickForm.value = { email: '', password: '' }
   } catch (error) {
     $q.notify({
@@ -550,6 +571,42 @@ const steps = [
 
 .footer-link:hover {
   text-decoration: underline;
+}
+
+/* ── Confirmação de cadastro ── */
+.signup-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.signup-confirm-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.signup-confirm-email {
+  background: var(--od-bg-subtle);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--od-text-1);
+  width: 100%;
+}
+
+.signup-confirm-steps {
+  text-align: left;
+  background: var(--od-bg-subtle);
+  padding: 14px 14px 14px 30px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--od-text-2);
+  line-height: 1.8;
+  margin: 0;
+  width: 100%;
 }
 
 /* ── Stats ── */

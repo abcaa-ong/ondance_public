@@ -4,7 +4,7 @@
     <!-- Form State -->
     <div v-if="!showConfirmation" class="register-container">
       <div class="register-header">
-        <div class="brand-title">On Dance</div>
+        <div class="brand-title">OnDance</div>
         <p class="brand-subtitle">Crie sua conta para começar</p>
       </div>
 
@@ -55,39 +55,37 @@
               </q-input>
 
             </div>
+
+            <!-- Error Message -->
+            <q-banner
+              v-if="errorMessage"
+              class="bg-negative text-white register-error"
+            >
+              {{ errorMessage }}
+            </q-banner>
+
+            <q-btn
+              unelevated
+              no-caps
+              type="submit"
+              label="Criar Conta"
+              :loading="loading"
+              class="register-btn q-mt-sm"
+            />
+
+            <div class="google-divider">
+              <span>ou continue com</span>
+            </div>
+
+            <div id="google-register-btn" class="google-btn-wrapper" />
+
+            <div class="text-center register-login-text">
+              Já tem uma conta?
+              <router-link to="/login" class="register-login-link">Faça login</router-link>
+            </div>
+
           </q-card-section>
         </q-card>
-
-        <!-- Error Message -->
-        <q-banner
-          v-if="errorMessage"
-          class="bg-negative text-white q-mb-md register-error"
-        >
-          {{ errorMessage }}
-        </q-banner>
-
-        <!-- Action Buttons -->
-        <div class="column q-gutter-sm">
-          <q-btn
-            unelevated
-            no-caps
-            type="submit"
-            label="Criar Conta"
-            :loading="loading"
-            class="register-btn"
-          />
-          <div class="text-center register-login-text">
-            <p>
-              Já tem uma conta?
-              <router-link
-                to="/login"
-                class="register-login-link"
-              >
-                Faça login
-              </router-link>
-            </p>
-          </div>
-        </div>
 
       </q-form>
     </div>
@@ -153,8 +151,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { authService } from 'src/services/auth'
+import { useGoogleAuth } from 'src/composables/useGoogleAuth'
+
+const router = useRouter()
+const $q = useQuasar()
+const { initGoogleButton } = useGoogleAuth()
+
+onMounted(() => {
+  initGoogleButton('google-register-btn', {
+    onSuccess: () => {
+      $q.notify({ type: 'positive', message: 'Login com Google realizado!' })
+      router.push('/courses/initial')
+    },
+    onError: () => {
+      $q.notify({ type: 'negative', message: 'Erro ao autenticar com Google.' })
+    },
+  })
+})
 
 const form = ref({
   email: '',
@@ -232,25 +249,55 @@ async function handleSubmit() {
   box-shadow: 0 24px 52px rgba(42, 81, 68, 0.06);
 }
 
+.register-card::before {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 5px;
+  background: var(--od-accent);
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+
+.google-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 14px;
+  color: var(--od-text-3);
+  font-size: 12px;
+}
+
+.google-divider::before,
+.google-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--od-border);
+}
+
+.google-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
 .register-btn {
-  background: #4db8a8;
+  background: var(--od-accent);
   color: white;
   border-radius: 14px;
   padding: 14px 0;
   font-weight: 700;
 }
 
-.register-btn:hover {
-  background: #3aa08d;
-}
 
 .register-login-text {
-  color: #63777d;
+  color: var(--od-text-3);
   font-size: 13px;
 }
 
 .register-login-link {
-  color: #4db8a8;
+  color: var(--od-accent);
   font-weight: 700;
   text-decoration: none;
 }
