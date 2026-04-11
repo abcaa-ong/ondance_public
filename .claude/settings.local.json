@@ -19,7 +19,9 @@
       "Bash(xargs wc:*)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(.venv/Scripts/pytest.exe api/tests/test_profile.py -v)"
+      "Bash(.venv/Scripts/pytest.exe api/tests/test_profile.py -v)",
+      "Bash(git -C E:/atados/ondance add .github/workflows/backend.yml .github/workflows/frontend.yml)",
+      "Bash(git -C E:/atados/ondance commit -m ':*)"
     ]
   }
 }
