@@ -1,8 +1,11 @@
 import pytest
 
+from user.models import Profile, User
+
 pytestmark = pytest.mark.django_db
 
 PROFILE_URL = '/api/profile/'
+PROFILES_URL = '/api/profiles/'
 
 
 # ── GET ────────────────────────────────────────────────────────────────────
@@ -131,3 +134,40 @@ def test_patch_permite_limpar_celular(api_client, user):
     resp = api_client.patch(PROFILE_URL, {'celular': None}, format='json')
     assert resp.status_code == 200
     assert resp.data['celular'] is None
+
+
+# ── GET /api/profiles/ ─────────────────────────────────────────────────────
+
+
+def test_profiles_anonimo_recebe_401(api_client):
+    resp = api_client.get(PROFILES_URL)
+    assert resp.status_code == 401
+
+
+def test_profiles_usuario_comum_recebe_403(api_client, user):
+    api_client.force_authenticate(user=user)
+    resp = api_client.get(PROFILES_URL)
+    assert resp.status_code == 403
+
+
+def test_profiles_admin_recebe_200(api_client, admin_user):
+    resp = api_client.get(PROFILES_URL)
+    api_client.force_authenticate(user=admin_user)
+    resp = api_client.get(PROFILES_URL)
+    assert resp.status_code == 200
+
+
+def test_profiles_retorna_campos_paginados(api_client, admin_user):
+    api_client.force_authenticate(user=admin_user)
+    resp = api_client.get(PROFILES_URL)
+    assert {'count', 'returned', 'next', 'previous', 'results'}.issubset(resp.data.keys())
+
+
+def test_profiles_paginacao_limita_10_por_pagina(api_client, admin_user):
+    for i in range(15):
+        u = User.objects.create_user(email=f'extra{i}@teste.com', password='senha123')
+        Profile.objects.create(user=u, name=f'Extra {i}')
+    api_client.force_authenticate(user=admin_user)
+    resp = api_client.get(PROFILES_URL)
+    assert resp.data['returned'] <= 10
+    assert resp.data['count'] >= 15

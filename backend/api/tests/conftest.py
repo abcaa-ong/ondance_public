@@ -56,6 +56,18 @@ def user(db):
 
 
 @pytest.fixture
+def city(state):
+    return City.objects.create(name='Campinas', state=state)
+
+
+@pytest.fixture
+def admin_user(db):
+    u = User.objects.create_user(email='admin@teste.com', password='senha123', is_staff=True)
+    Profile.objects.create(user=u, name='Admin')
+    return u
+
+
+@pytest.fixture
 def teacher(db):
     return User.objects.create_user(email='teacher@teste.com', password='senha123')
 

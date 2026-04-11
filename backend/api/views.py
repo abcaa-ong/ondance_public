@@ -169,3 +169,12 @@ class ProfileView(APIView):
 
 
 profile_view = ProfileView.as_view()
+
+
+class ProfileListView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Profile.objects.select_related('user', 'city__state').order_by('name')
+
+
+profile_list = ProfileListView.as_view()
