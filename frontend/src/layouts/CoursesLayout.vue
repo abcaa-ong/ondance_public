@@ -20,24 +20,29 @@
           </q-btn>
 
           <q-btn flat round dense style="padding: 2px;">
-            <q-avatar
-              size="32px"
-              :style="{ background: 'var(--od-accent)', color: '#fff', fontSize: '13px', fontWeight: 600 }"
-            >
+            <q-avatar class="header-avatar">
               {{ userInitial }}
             </q-avatar>
-            <q-menu anchor="bottom right" self="top right" :offset="[0, 8]">
-              <q-list style="min-width: 160px;">
-                <q-item clickable v-close-popup :to="'/perfil'">
-                  <q-item-section avatar>
-                    <q-icon name="person_outline" size="18px" />
+            <q-menu anchor="bottom right" self="top right" :offset="[0, 8]" class="user-menu">
+              <!-- User card -->
+              <div class="user-menu-card">
+                <q-avatar class="user-menu-avatar">{{ userInitial }}</q-avatar>
+                <div class="user-menu-info">
+                  <div class="user-menu-name">{{ userName }}</div>
+                  <span class="user-menu-badge" :class="`role--${user?.role}`">{{ roleLabel }}</span>
+                </div>
+              </div>
+              <q-separator />
+              <q-list style="padding: 4px;">
+                <q-item clickable v-close-popup :to="'/perfil'" class="user-menu-item">
+                  <q-item-section avatar style="min-width: 32px;">
+                    <q-icon name="person_outline" size="16px" />
                   </q-item-section>
                   <q-item-section>Meu perfil</q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item clickable v-close-popup @click="handleLogout">
-                  <q-item-section avatar>
-                    <q-icon name="logout" size="18px" />
+                <q-item clickable v-close-popup @click="handleLogout" class="user-menu-item user-menu-logout">
+                  <q-item-section avatar style="min-width: 32px;">
+                    <q-icon name="logout" size="16px" />
                   </q-item-section>
                   <q-item-section>Sair</q-item-section>
                 </q-item>
@@ -92,10 +97,20 @@ const { isDark, toggle: toggleDark } = useDarkMode()
 const { logout, user } = useAuth()
 const router = useRouter()
 
+const userName = computed(() => user.value?.name || user.value?.email || '')
+
 const userInitial = computed(() => {
-  const email = user.value?.email || ''
-  return email.charAt(0).toUpperCase()
+  const name = user.value?.name || user.value?.email || ''
+  const parts = name.split(' ').filter(Boolean)
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
+  return name.charAt(0).toUpperCase()
 })
+
+const roleLabel = computed(() => ({
+  aluno: 'Aluno',
+  professor: 'Professor',
+  admin: 'Administrador',
+}[user.value?.role] ?? ''))
 
 function handleLogout () {
   logout()
@@ -122,3 +137,105 @@ const navSections = [
   }
 ]
 </script>
+
+<style scoped>
+.header-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--od-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+</style>
+
+<style>
+.user-menu {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14) !important;
+  min-width: 220px !important;
+  overflow: hidden;
+  border: 1px solid var(--od-border) !important;
+  background: var(--od-bg-surface) !important;
+}
+
+.user-menu-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.user-menu-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--od-accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-menu-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.user-menu-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--od-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-menu-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.role--aluno {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+}
+
+.role--professor {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+}
+
+.role--admin {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.body--dark .role--aluno  { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; }
+.body--dark .role--professor { background: rgba(167, 139, 250, 0.2); color: #c4b5fd; }
+.body--dark .role--admin  { background: rgba(252, 165, 165, 0.18); color: #fca5a5; }
+
+.user-menu-item {
+  border-radius: 8px !important;
+  font-size: 13.5px;
+  color: var(--od-text-1) !important;
+  min-height: 36px !important;
+}
+
+.user-menu-logout {
+  color: #e53935 !important;
+}
+
+.user-menu-logout .q-icon {
+  color: #e53935 !important;
+}
+</style>

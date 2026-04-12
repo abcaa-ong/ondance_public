@@ -44,21 +44,15 @@
 
     <!-- User pill -->
     <div class="q-mt-auto q-pa-sm">
-      <div
-        class="row items-center q-pa-sm"
-        style="background: rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; gap: 10px;"
-        @click="goToSettings"
-      >
-        <q-avatar size="32px" style="background: var(--od-accent); font-size: 12px; font-weight: 600; color: #fff;">
+      <div class="user-pill" @click="goToSettings">
+        <q-avatar size="34px" class="user-pill-avatar">
           {{ initials }}
         </q-avatar>
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            {{ user?.name }}
-          </div>
-          <div style="font-size: 11px; color: rgba(255,255,255,0.35);">{{ roleLabel }}</div>
+        <div class="user-pill-info">
+          <div class="user-pill-name">{{ user?.name || user?.email }}</div>
+          <span class="user-role-badge" :class="`role--${user?.role}`">{{ roleLabel }}</span>
         </div>
-        <q-btn flat round dense icon="logout" size="xs" style="color: rgba(255,255,255,0.3);" @click.stop="handleLogout" />
+        <q-btn flat round dense icon="logout" size="xs" class="user-pill-logout" @click.stop="handleLogout" />
       </div>
     </div>
   </q-drawer>
@@ -104,3 +98,75 @@ function handleLogout () {
 
 defineExpose({ toggle: () => { drawerOpen.value = !drawerOpen.value } })
 </script>
+
+<style scoped>
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.user-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-pill-avatar {
+  background: var(--od-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-pill-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.user-pill-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  width: fit-content;
+}
+
+.role--aluno {
+  background: rgba(56, 189, 248, 0.18);
+  color: #7dd3fc;
+}
+
+.role--professor {
+  background: rgba(167, 139, 250, 0.2);
+  color: #c4b5fd;
+}
+
+.role--admin {
+  background: rgba(252, 165, 165, 0.18);
+  color: #fca5a5;
+}
+
+.user-pill-logout {
+  color: rgba(255, 255, 255, 0.3) !important;
+  flex-shrink: 0;
+}
+</style>
