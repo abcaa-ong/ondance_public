@@ -65,8 +65,8 @@ async function login(credentials) {
   return response
 }
 
-async function googleLogin(credential) {
-  const response = await authService.googleLogin(credential)
+async function googleLogin(credential, role = 'aluno') {
+  const response = await authService.googleLogin(credential, role)
   saveTokens(response.data)
   return response
 }

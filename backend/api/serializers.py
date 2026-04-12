@@ -146,6 +146,11 @@ GOOGLE_TOKENINFO_URL = 'https://oauth2.googleapis.com/tokeninfo'
 
 class GoogleSocialAuthSerializer(serializers.Serializer):
     credential = serializers.CharField(write_only=True)
+    role = serializers.ChoiceField(
+        choices=['aluno', 'professor'],
+        default='aluno',
+        required=False,
+    )
 
     def validate_credential(self, value):
         try:

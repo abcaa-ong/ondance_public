@@ -311,6 +311,7 @@ async function fetchFeaturedCourses() {
 onMounted(() => {
   if (isAuthenticated.value) fetchFeaturedCourses()
   initGoogleButton('google-signup-btn', {
+    getRole: () => quickForm.value.role,
     onSuccess: () => {
       $q.notify({ type: 'positive', message: 'Login realizado com sucesso!' })
       router.push('/courses/initial')

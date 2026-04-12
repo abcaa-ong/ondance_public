@@ -108,6 +108,7 @@ class GoogleSocialAuthView(APIView):
         serializer.is_valid(raise_exception=True)
 
         id_info = serializer.validated_data['credential']
+        role = serializer.validated_data.get('role', 'aluno')
         uid = id_info['sub']
         email = User.objects.normalize_email(id_info['email'])
         google_name = id_info.get('name', '') or email.split('@')[0]
@@ -124,6 +125,8 @@ class GoogleSocialAuthView(APIView):
             )
             if created:
                 user.set_unusable_password()
+                user.is_teacher = (role == 'professor')
+                user.is_student = (role == 'aluno')
                 user.save()
             Profile.objects.get_or_create(
                 user=user,

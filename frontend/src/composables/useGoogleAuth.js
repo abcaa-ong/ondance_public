@@ -45,7 +45,7 @@ export function useGoogleAuth() {
     `
   }
 
-  async function initGoogleButton(elementId, { onSuccess, onError }) {
+  async function initGoogleButton(elementId, { onSuccess, onError, getRole }) {
     if (!CLIENT_ID) {
       renderFallbackButton(elementId)
       return
@@ -54,14 +54,15 @@ export function useGoogleAuth() {
     await loadGoogleSdk()
 
     // Atualiza callback ativo (cada página pode ter o seu)
-    _callbackRef = { onSuccess, onError }
+    _callbackRef = { onSuccess, onError, getRole }
 
     if (!_initialized) {
       window.google.accounts.id.initialize({
         client_id: CLIENT_ID,
         callback: async ({ credential }) => {
           try {
-            const response = await googleLogin(credential)
+            const role = _callbackRef?.getRole?.() ?? 'aluno'
+            const response = await googleLogin(credential, role)
             _callbackRef?.onSuccess?.(response)
           } catch (error) {
             _callbackRef?.onError?.(error)

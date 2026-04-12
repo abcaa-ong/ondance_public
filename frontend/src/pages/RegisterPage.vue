@@ -202,6 +202,7 @@ const { initGoogleButton } = useGoogleAuth()
 
 onMounted(() => {
   initGoogleButton('google-register-btn', {
+    getRole: () => form.value.role,
     onSuccess: () => {
       $q.notify({ type: 'positive', message: 'Login com Google realizado!' })
       router.push('/courses/initial')

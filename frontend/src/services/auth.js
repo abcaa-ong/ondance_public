@@ -9,8 +9,8 @@ export const authService = {
     return api.post('/register/', userData)
   },
 
-  googleLogin(credential) {
-    return api.post('/auth/social/google/', { credential })
+  googleLogin(credential, role = 'aluno') {
+    return api.post('/auth/social/google/', { credential, role })
   },
 
   refresh(refreshToken) {
