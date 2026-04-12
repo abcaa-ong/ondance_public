@@ -135,6 +135,8 @@ class GoogleSocialAuthView(APIView):
             SocialAccount.objects.create(provider='google', uid=uid, user=user)
 
         refresh = RefreshToken.for_user(user)
+        refresh['role'] = user.role
+        refresh['name'] = user.profile.name if hasattr(user, 'profile') else ''
         return Response(
             {
                 'refresh': str(refresh),
