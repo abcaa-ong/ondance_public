@@ -101,4 +101,6 @@ function handleLogout () {
   logout()
   router.push('/login')
 }
+
+defineExpose({ toggle: () => { drawerOpen.value = !drawerOpen.value } })
 </script>

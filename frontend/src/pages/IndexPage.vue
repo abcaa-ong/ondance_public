@@ -260,10 +260,12 @@ import { authService } from 'src/services/auth'
 import { courseService } from 'src/services/course'
 import { useQuasar } from 'quasar'
 import { useGoogleAuth } from 'src/composables/useGoogleAuth'
+import { useAuth } from 'src/composables/useAuth'
 
 const $q = useQuasar()
 const router = useRouter()
 const { initGoogleButton } = useGoogleAuth()
+const { isAuthenticated } = useAuth()
 
 const currentYear = new Date().getFullYear()
 
@@ -284,7 +286,7 @@ async function fetchFeaturedCourses() {
 }
 
 onMounted(() => {
-  fetchFeaturedCourses()
+  if (isAuthenticated.value) fetchFeaturedCourses()
   initGoogleButton('google-signup-btn', {
     onSuccess: () => {
       $q.notify({ type: 'positive', message: 'Login realizado com sucesso!' })
@@ -417,6 +419,8 @@ const steps = [
   letter-spacing: -1px;
   color: var(--od-text-1);
   margin: 0 0 20px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .hero-sub {
@@ -939,20 +943,38 @@ const steps = [
 
 @media (max-width: 767px) {
   .hero-section {
-    padding: 48px 0 40px;
+    padding: 36px 0 32px;
   }
 
   .hero-container {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 28px;
   }
 
   .hero-headline {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .hero-sub {
     font-size: 15px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-btn-primary {
+    width: 100% !important;
+    text-align: center;
+  }
+
+  .hero-btn-ghost {
+    text-align: center;
+  }
+
+  .signup-card {
+    padding: 24px 20px;
   }
 
   .stats-container {

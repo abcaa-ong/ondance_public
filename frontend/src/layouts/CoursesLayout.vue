@@ -50,6 +50,7 @@
 
     <!-- Sidebar -->
     <AppSidebar
+      ref="sidebarRef"
       :nav-sections="navSections"
       settings-route="/courses/configuracoes"
     />
@@ -84,8 +85,8 @@ const profileComplete = localStorage.getItem('profile_complete')
 const onboardingDismissed = localStorage.getItem('onboarding_dismissed')
 const showOnboarding = ref(profileComplete === 'false' && !onboardingDismissed)
 
-const drawerOpen = ref(true)
-function toggleDrawer () { drawerOpen.value = !drawerOpen.value }
+const sidebarRef = ref(null)
+function toggleDrawer () { sidebarRef.value?.toggle() }
 
 const { isDark, toggle: toggleDark } = useDarkMode()
 const { logout, user } = useAuth()

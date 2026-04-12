@@ -8,6 +8,21 @@
         <p class="brand-subtitle">Crie sua conta para começar</p>
       </div>
 
+      <div class="register-benefits">
+        <div class="benefit-item">
+          <span class="benefit-icon">🎬</span>
+          <span>Acesso a mais de 30 cursos em vídeo</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🎓</span>
+          <span>Aprenda com os melhores professores do Brasil</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">⚡</span>
+          <span>No seu ritmo, de qualquer lugar</span>
+        </div>
+      </div>
+
       <q-form @submit.prevent="handleSubmit">
 
         <q-card flat bordered class="register-card">
@@ -240,6 +255,26 @@ async function handleSubmit() {
   color: var(--od-text-3);
   font-size: 15px;
   margin: 0;
+}
+
+.register-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--od-text-2);
+}
+
+.benefit-icon {
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .register-card {

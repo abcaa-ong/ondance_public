@@ -2,6 +2,11 @@ import { useAuth } from 'src/composables/useAuth'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
+// Google só permite um initialize() por página. Guardamos o estado e o callback
+// atual em escopo de módulo para reutilizar entre componentes.
+let _initialized = false
+let _callbackRef = null
+
 function loadGoogleSdk() {
   return new Promise((resolve, reject) => {
     if (window.google?.accounts) return resolve()
@@ -48,28 +53,39 @@ export function useGoogleAuth() {
 
     await loadGoogleSdk()
 
-    window.google.accounts.id.initialize({
-      client_id: CLIENT_ID,
-      callback: async ({ credential }) => {
-        try {
-          const response = await googleLogin(credential)
-          onSuccess?.(response)
-        } catch (error) {
-          onError?.(error)
-        }
-      },
-    })
+    // Atualiza callback ativo (cada página pode ter o seu)
+    _callbackRef = { onSuccess, onError }
 
-    window.google.accounts.id.renderButton(
-      document.getElementById(elementId),
-      {
-        theme: 'outline',
-        size: 'large',
-        width: '100%',
-        text: 'continue_with',
-        locale: 'pt-BR',
-      }
-    )
+    if (!_initialized) {
+      window.google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: async ({ credential }) => {
+          try {
+            const response = await googleLogin(credential)
+            _callbackRef?.onSuccess?.(response)
+          } catch (error) {
+            _callbackRef?.onError?.(error)
+          }
+        },
+      })
+      _initialized = true
+    }
+
+    const el = document.getElementById(elementId)
+    // Google só aceita número inteiro em pixels (máx 400). Usa a largura real
+    // do container ou 360 como fallback, sempre dentro do limite permitido.
+    const width = Math.min(Math.round(el?.offsetWidth || 360), 400)
+    // Em dark mode o botão branco (outline) destoa muito; filled_blue fica
+    // mais harmonioso com fundos escuros.
+    const isDark = document.body.classList.contains('body--dark')
+
+    window.google.accounts.id.renderButton(el, {
+      theme: isDark ? 'filled_blue' : 'outline',
+      size: 'large',
+      width,
+      text: 'continue_with',
+      locale: 'pt-BR',
+    })
   }
 
   return { initGoogleButton }

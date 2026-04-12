@@ -47,51 +47,69 @@
         </nav>
 
         <!-- Mobile hamburger -->
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
+        <button
           class="mobile-menu-btn"
-          @click="mobileDrawer = !mobileDrawer"
-        />
+          @click="openDrawer"
+          aria-label="Abrir menu"
+        >
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
       </q-toolbar>
     </q-header>
-
-    <!-- Mobile drawer -->
-    <q-drawer v-model="mobileDrawer" side="right" overlay behavior="mobile" class="mobile-drawer">
-      <div class="mobile-nav">
-        <router-link to="/courses/lista" class="mobile-nav-link" @click="mobileDrawer = false">
-          Cursos
-        </router-link>
-
-        <template v-if="isAuthenticated">
-          <router-link to="/courses/initial" class="mobile-nav-link" @click="mobileDrawer = false">
-            Minha Área
-          </router-link>
-          <router-link to="/perfil" class="mobile-nav-link" @click="mobileDrawer = false">
-            Perfil
-          </router-link>
-          <button class="mobile-nav-link mobile-logout" @click="handleLogout">
-            Sair
-          </button>
-        </template>
-
-        <template v-else>
-          <router-link to="/login" class="mobile-nav-link" @click="mobileDrawer = false">
-            Entrar
-          </router-link>
-          <router-link to="/register" class="mobile-nav-link mobile-nav-cta" @click="mobileDrawer = false">
-            Começar grátis
-          </router-link>
-        </template>
-      </div>
-    </q-drawer>
 
     <q-page-container>
       <router-view />
     </q-page-container>
   </q-layout>
+
+  <!-- Mobile drawer — fora do q-layout para evitar stacking context -->
+  <Teleport to="body">
+    <div
+      v-if="mobileDrawer"
+      class="od-overlay"
+      @click.self="mobileDrawer = false"
+    >
+      <nav class="od-panel">
+        <div class="od-panel-header">
+          <span class="od-panel-logo">OnDance</span>
+          <button class="od-panel-close" @click="mobileDrawer = false" aria-label="Fechar menu">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="od-panel-nav">
+          <router-link to="/courses/lista" class="od-panel-link" @click="mobileDrawer = false">
+            Cursos
+          </router-link>
+
+          <template v-if="isAuthenticated">
+            <router-link to="/courses/initial" class="od-panel-link" @click="mobileDrawer = false">
+              Minha Área
+            </router-link>
+            <router-link to="/perfil" class="od-panel-link" @click="mobileDrawer = false">
+              Perfil
+            </router-link>
+            <button class="od-panel-link od-panel-logout" @click="handleLogout">
+              Sair
+            </button>
+          </template>
+
+          <template v-else>
+            <router-link to="/login" class="od-panel-link" @click="mobileDrawer = false">
+              Entrar
+            </router-link>
+            <button class="od-panel-link od-panel-cta" @click="scrollToSignup(); mobileDrawer = false">
+              Começar grátis
+            </button>
+          </template>
+        </div>
+      </nav>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -106,6 +124,10 @@ const router = useRouter()
 
 const mobileDrawer = ref(false)
 
+function openDrawer() {
+  mobileDrawer.value = true
+}
+
 function handleLogout() {
   logout()
   mobileDrawer.value = false
@@ -117,7 +139,7 @@ function scrollToSignup() {
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   } else {
-    router.push('/register')
+    router.push('/')
   }
 }
 </script>
@@ -144,7 +166,6 @@ function scrollToSignup() {
   letter-spacing: -0.5px;
 }
 
-/* Override od-logo for dark dot on light header */
 .navbar-logo :deep(.od-logo-dot) {
   background: var(--od-accent);
 }
@@ -206,50 +227,21 @@ function scrollToSignup() {
 
 /* Mobile */
 .mobile-menu-btn {
-  display: none !important;
-  color: var(--od-text-2) !important;
-}
-
-.mobile-drawer {
-  background: var(--od-bg-surface) !important;
-}
-
-.mobile-nav {
-  display: flex;
-  flex-direction: column;
-  padding: 24px 16px;
-  gap: 4px;
-}
-
-.mobile-nav-link {
-  display: block;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--od-text-1);
-  text-decoration: none;
-  padding: 12px 16px;
-  border-radius: 10px;
-  transition: background 0.15s;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   border: none;
   background: transparent;
+  color: var(--od-text-2);
   cursor: pointer;
-  text-align: left;
-  width: 100%;
+  border-radius: 8px;
+  padding: 0;
 }
 
-.mobile-nav-link:hover {
+.mobile-menu-btn:hover {
   background: var(--od-bg-subtle);
-}
-
-.mobile-nav-cta {
-  background: var(--od-accent) !important;
-  color: #fff !important;
-  margin-top: 8px;
-  text-align: center !important;
-}
-
-.mobile-logout {
-  color: #e53935 !important;
 }
 
 @media (max-width: 767px) {
@@ -258,7 +250,106 @@ function scrollToSignup() {
   }
 
   .mobile-menu-btn {
-    display: flex !important;
+    display: flex;
   }
+}
+</style>
+
+<!-- Estilos globais do drawer mobile (Teleport sai do escopo do componente) -->
+<style>
+.od-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.od-panel {
+  width: 280px;
+  height: 100%;
+  background: var(--od-bg-surface);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: od-slide-in 0.18s ease;
+}
+
+@keyframes od-slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.od-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--od-border);
+}
+
+.od-panel-logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--od-accent);
+  letter-spacing: -0.5px;
+}
+
+.od-panel-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--od-text-2);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.od-panel-close:hover {
+  background: var(--od-bg-subtle);
+}
+
+.od-panel-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  gap: 4px;
+}
+
+.od-panel-link {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--od-text-1);
+  text-decoration: none;
+  padding: 12px 16px;
+  border-radius: 10px;
+  transition: background 0.12s;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.od-panel-link:hover {
+  background: var(--od-bg-subtle);
+}
+
+.od-panel-cta {
+  background: var(--od-accent) !important;
+  color: #fff !important;
+  margin-top: 8px;
+  text-align: center !important;
+}
+
+.od-panel-logout {
+  color: #e53935 !important;
 }
 </style>

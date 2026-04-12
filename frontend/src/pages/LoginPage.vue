@@ -69,7 +69,7 @@
 
           <div class="signup-footer">
             <span>Não tem uma conta?</span>
-            <router-link to="/register" class="signup-link">Cadastre-se</router-link>
+            <router-link to="/" class="signup-link">Cadastre-se</router-link>
           </div>
         </q-card-section>
       </q-card>
