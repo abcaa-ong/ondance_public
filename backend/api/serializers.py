@@ -3,17 +3,32 @@ import requests as http_requests
 from django.conf import settings
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from course.models import Course
 from user.models import City, Profile, State, User
 
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['role'] = user.role
+        return token
+
+
 class UserSerializer(serializers.ModelSerializer):
     MIN_PASSWORD_LENGTH = 8
 
+    role = serializers.ChoiceField(
+        choices=['aluno', 'professor'],
+        default='aluno',
+        write_only=True,
+    )
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'password']
+        fields = ['id', 'email', 'password', 'role']
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'validators': []},  # validate_email trata unicidade com mensagem em PT
@@ -33,10 +48,14 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        role = validated_data.pop('role', 'aluno')
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
         )
+        user.is_teacher = (role == 'professor')
+        user.is_student = (role == 'aluno')
+        user.save()
         Profile.objects.create(user=user)
         return user
 
@@ -95,10 +114,15 @@ class CourseSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     city_detail = CitySerializer(source='city', read_only=True)
+    role = serializers.ChoiceField(
+        choices=['aluno', 'professor'],
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = Profile
-        fields = ['email', 'name', 'photo', 'celular', 'telephone', 'birthday', 'city', 'city_detail']
+        fields = ['email', 'name', 'photo', 'celular', 'telephone', 'birthday', 'city', 'city_detail', 'role']
         extra_kwargs = {
             'city': {'required': False, 'allow_null': True},
             'photo': {'required': False, 'allow_null': True},
@@ -107,6 +131,14 @@ class ProfileSerializer(serializers.ModelSerializer):
             'birthday': {'required': False, 'allow_null': True},
             'name': {'required': False},
         }
+
+    def update(self, instance, validated_data):
+        role = validated_data.pop('role', None)
+        if role is not None:
+            instance.user.is_teacher = (role == 'professor')
+            instance.user.is_student = (role == 'aluno')
+            instance.user.save()
+        return super().update(instance, validated_data)
 
 
 GOOGLE_TOKENINFO_URL = 'https://oauth2.googleapis.com/tokeninfo'

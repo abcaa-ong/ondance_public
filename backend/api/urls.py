@@ -2,10 +2,12 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from api import views
+from api.serializers import CustomTokenObtainPairSerializer
 from api.throttles import TokenThrottle
 
 
 class ThrottledTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
     throttle_classes = [TokenThrottle]
 
 

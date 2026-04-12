@@ -1,10 +1,11 @@
-# user/permissions.py
 from rest_framework import permissions
+
 
 class IsTeacher(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'TEACHER'
+        return request.user.is_authenticated and request.user.is_teacher
+
 
 class IsOnDanceAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'ADMIN'
+        return request.user.is_authenticated and request.user.is_staff

@@ -33,6 +33,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'  # Define o e-mail como login
     REQUIRED_FIELDS = []      # O email já é obrigatório por ser USERNAME_FIELD
 
+    @property
+    def role(self):
+        if self.is_staff:
+            return 'admin'
+        if self.is_teacher:
+            return 'professor'
+        return 'aluno'
+
     def __str__(self):
         return self.email
 

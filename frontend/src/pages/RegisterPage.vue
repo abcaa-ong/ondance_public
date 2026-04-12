@@ -29,6 +29,30 @@
           <q-card-section>
             <div class="column q-gutter-md">
 
+              <!-- Role Selector -->
+              <div class="role-selector">
+                <button
+                  type="button"
+                  class="role-card"
+                  :class="{ 'role-card--active': form.role === 'aluno' }"
+                  @click="form.role = 'aluno'"
+                >
+                  <span class="role-card-icon">🎓</span>
+                  <span class="role-card-title">Sou Aluno</span>
+                  <span class="role-card-sub">Quero aprender</span>
+                </button>
+                <button
+                  type="button"
+                  class="role-card"
+                  :class="{ 'role-card--active': form.role === 'professor' }"
+                  @click="form.role = 'professor'"
+                >
+                  <span class="role-card-icon">🎤</span>
+                  <span class="role-card-title">Sou Professor</span>
+                  <span class="role-card-sub">Quero ensinar</span>
+                </button>
+              </div>
+
               <!-- Email Field -->
               <q-input
                 class="register-input"
@@ -189,6 +213,7 @@ onMounted(() => {
 })
 
 const form = ref({
+  role: 'aluno',
   email: '',
   password: '',
 })
@@ -213,6 +238,7 @@ async function handleSubmit() {
     await authService.register({
       email: form.value.email,
       password: form.value.password,
+      role: form.value.role,
     })
 
     showConfirmation.value = true
@@ -339,6 +365,52 @@ async function handleSubmit() {
 
 .register-login-link:hover {
   text-decoration: underline;
+}
+
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border-radius: 14px;
+  border: 2px solid var(--od-border);
+  background: var(--od-bg-subtle);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.role-card:hover {
+  border-color: var(--od-accent);
+  background: var(--od-bg-page);
+}
+
+.role-card--active {
+  border-color: var(--od-accent) !important;
+  background: var(--od-bg-page) !important;
+}
+
+.role-card-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.role-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--od-text-1);
+}
+
+.role-card-sub {
+  font-size: 11px;
+  color: var(--od-text-3);
 }
 
 .register-input {

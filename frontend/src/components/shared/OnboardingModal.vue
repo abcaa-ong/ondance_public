@@ -12,6 +12,26 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none q-gutter-sm">
+        <!-- Role selector -->
+        <div class="ob-role-row">
+          <button
+            type="button"
+            class="ob-role-btn"
+            :class="{ 'ob-role-btn--active': form.role === 'aluno' }"
+            @click="form.role = 'aluno'"
+          >
+            🎓 Sou Aluno
+          </button>
+          <button
+            type="button"
+            class="ob-role-btn"
+            :class="{ 'ob-role-btn--active': form.role === 'professor' }"
+            @click="form.role = 'professor'"
+          >
+            🎤 Sou Professor
+          </button>
+        </div>
+
         <q-input
           v-model="form.name"
           label="Nome completo"
@@ -61,7 +81,7 @@ const emit = defineEmits(['close', 'saved'])
 const show = ref(true)
 const loading = ref(false)
 const errorMsg = ref('')
-const form = ref({ name: '', celular: '' })
+const form = ref({ role: 'aluno', name: '', celular: '' })
 
 const inputStyle = 'border-radius: 8px;'
 
@@ -85,7 +105,11 @@ async function save() {
   errorMsg.value = ''
 
   try {
-    await profileService.update(form.value)
+    await profileService.update({
+      name: form.value.name,
+      celular: form.value.celular,
+      role: form.value.role,
+    })
     localStorage.setItem('profile_complete', 'true')
     show.value = false
     emit('saved')
@@ -102,3 +126,33 @@ function dismiss() {
   emit('close')
 }
 </script>
+
+<style scoped>
+.ob-role-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ob-role-btn {
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 2px solid var(--od-border);
+  background: var(--od-bg-subtle);
+  color: var(--od-text-1);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ob-role-btn:hover {
+  border-color: var(--od-accent);
+}
+
+.ob-role-btn--active {
+  border-color: var(--od-accent) !important;
+  background: var(--od-bg-page) !important;
+}
+</style>
