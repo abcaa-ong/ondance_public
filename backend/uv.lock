@@ -33,6 +33,7 @@ dependencies = [
     { name = "django-extensions" },
     { name = "djangorestframework" },
     { name = "djangorestframework-simplejwt" },
+    { name = "faker" },
     { name = "pillow" },
     { name = "python-decouple" },
 ]
@@ -58,6 +59,7 @@ requires-dist = [
     { name = "django-extensions", specifier = ">=4.1" },
     { name = "djangorestframework", specifier = ">=3.17.0" },
     { name = "djangorestframework-simplejwt", specifier = ">=5.5.1" },
+    { name = "faker", specifier = ">=40.14.1" },
     { name = "pillow", specifier = ">=12.1.1" },
     { name = "python-decouple", specifier = ">=3.8" },
 ]
@@ -421,6 +423,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/cc/28/c14e053b6762b1044f34a13aab6859bbf40456d37d23aa286ac24cfd9a5d/executing-2.2.1.tar.gz", hash = "sha256:3632cc370565f6648cc328b32435bd120a1e4ebb20c77e3fdde9a13cd1e533c4", size = 1129488, upload-time = "2025-09-01T09:48:10.866Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/ea/53f2148663b321f21b5a606bd5f191517cf40b7072c0497d3c92c4a13b1e/executing-2.2.1-py2.py3-none-any.whl", hash = "sha256:760643d3452b4d777d295bb167ccc74c64a81df23fb5e08eff250c425a4b2017", size = 28317, upload-time = "2025-09-01T09:48:08.5Z" },
+]
+
+[[package]]
+name = "faker"
+version = "40.14.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d4/f5/2511c32048f959aaf21c9e6806e0d375392068fbdffec755d651f8863cc1/faker-40.14.1.tar.gz", hash = "sha256:b12b657eaa78c99c138b45e77167c9f42309ed1cc40255c5e853ef3113fcdecc", size = 1962264, upload-time = "2026-04-17T19:30:44.134Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/db/80cad2c3a2bcd4429f88483db8a4f3efbedacab89bd5d2a82a2e8f754d8f/faker-40.14.1-py3-none-any.whl", hash = "sha256:3ef7824c1814eab7ab4241b6979d5e908c58bfbfdfeb0f08940f595dbb5cd937", size = 1994713, upload-time = "2026-04-17T19:30:41.862Z" },
 ]
 
 [[package]]
