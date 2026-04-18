@@ -24,4 +24,8 @@ export const courseService = {
   mine() {
     return api.get('/courses/mine/')
   },
+
+  published() {
+    return api.get('/courses/published/')
+  },
 }
