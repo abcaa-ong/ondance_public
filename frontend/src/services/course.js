@@ -19,5 +19,9 @@ export const courseService = {
 
   remove(id) {
     return api.delete(`/courses/${id}/`)
-  }
+  },
+
+  mine() {
+    return api.get('/courses/mine/')
+  },
 }

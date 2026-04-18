@@ -245,7 +245,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+import { useAuth } from 'src/composables/useAuth'
+import { courseService } from 'src/services/course'
+
+const $q = useQuasar()
+const router = useRouter()
+const { user } = useAuth()
 
 const saving = ref(false)
 let nextId = 1
@@ -256,6 +264,12 @@ const form = ref({
   description: '',
   duration:    '',
   level:       null,
+})
+
+onMounted(() => {
+  if (user.value?.email) {
+    form.value.teacher = user.value.email
+  }
 })
 
 const modules = ref([])
@@ -299,8 +313,17 @@ function saveDraft () {
 async function handleSubmit () {
   saving.value = true
   try {
-    console.log('publicando:', { ...form.value, modules: modules.value })
-    // TODO: integrar com API
+    await courseService.create({
+      title:   form.value.title,
+      teacher: user.value?.email ?? form.value.teacher,
+    })
+    $q.notify({ type: 'positive', message: 'Curso publicado com sucesso!', position: 'top', timeout: 2500 })
+    router.push('/professor/cursos')
+  } catch (err) {
+    const msg = err.response?.data
+      ? Object.values(err.response.data).flat().join(' ')
+      : 'Erro ao publicar o curso. Tente novamente.'
+    $q.notify({ type: 'negative', message: msg, position: 'top', timeout: 3000 })
   } finally {
     saving.value = false
   }
