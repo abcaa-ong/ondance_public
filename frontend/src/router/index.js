@@ -33,7 +33,7 @@ router.beforeEach((to) => {
 
   const role = parseRole(token)
 
-  if (token && to.meta.guest && (to.name === 'login' || to.name === 'register')) {
+  if (token && to.meta.guest) {
     return roleHome[role] ?? '/student/dashboard'
   }
 
