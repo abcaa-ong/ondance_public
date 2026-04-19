@@ -55,30 +55,14 @@ const profileRoute = {
   ]
 }
 
-const loginRoutes = {
-  path: '/login',
-  component: () => import('layouts/MainLayout.vue'),
-  meta: { guest: true },
-  children: [
-    { path: '', name: 'login', component: () => import('pages/LoginPage.vue') }
-  ]
-}
-
-const registerRoutes = {
-  path: '/register',
-  component: () => import('layouts/MainLayout.vue'),
-  meta: { guest: true },
-  children: [
-    { path: '', name: 'register', component: () => import('pages/RegisterPage.vue') }
-  ]
-}
-
-const mainRoutes = {
+const publicRoutes = {
   path: '/',
   component: () => import('layouts/MainLayout.vue'),
   meta: { guest: true },
   children: [
-    { path: '', name: 'home', component: () => import('pages/IndexPage.vue') },
+    { path: '',         name: 'home',     component: () => import('pages/IndexPage.vue') },
+    { path: 'login',    name: 'login',    component: () => import('pages/LoginPage.vue') },
+    { path: 'register', name: 'register', component: () => import('pages/RegisterPage.vue') },
   ]
 }
 
@@ -86,10 +70,8 @@ const routes = [
   studentRoutes,
   teacherRoutes,
   adminRoutes,
-  loginRoutes,
-  registerRoutes,
+  publicRoutes,
   profileRoute,
-  mainRoutes,
   { path: '/:catchAll(.*)*', name: '404', component: () => import('pages/ErrorNotFound.vue') }
 ]
 
