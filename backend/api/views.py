@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
@@ -8,6 +9,7 @@ from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
 
 from api.serializers import (
+    AdminCourseSerializer,
     CitySerializer,
     CourseSerializer,
     GoogleSocialAuthSerializer,
@@ -137,6 +139,49 @@ class CourseDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 course_detail = CourseDetail.as_view()
+
+
+class AdminCourseList(generics.ListAPIView):
+    serializer_class = AdminCourseSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        qs = Course.objects.select_related('teacher__profile').order_by('title')
+        status_filter = self.request.query_params.get('status')
+        if status_filter:
+            qs = qs.filter(status__iexact=status_filter)
+        return qs
+
+
+admin_course_list = AdminCourseList.as_view()
+
+
+class AdminCourseApprove(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        course.status = 'APPROVED'
+        course.is_published = True
+        course.save()
+        return Response(AdminCourseSerializer(course, context={'request': request}).data)
+
+
+admin_course_approve = AdminCourseApprove.as_view()
+
+
+class AdminCourseReject(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        course.status = 'REJECTED'
+        course.is_published = False
+        course.save()
+        return Response(AdminCourseSerializer(course, context={'request': request}).data)
+
+
+admin_course_reject = AdminCourseReject.as_view()
 
 
 class PasswordChangeView(APIView):

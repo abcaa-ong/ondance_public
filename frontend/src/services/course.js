@@ -28,4 +28,17 @@ export const courseService = {
   published() {
     return api.get('/courses/published/')
   },
+
+  adminList(status = null) {
+    const params = status ? { status } : {}
+    return api.get('/admin/courses/', { params })
+  },
+
+  approve(id) {
+    return api.post(`/admin/courses/${id}/approve/`)
+  },
+
+  reject(id) {
+    return api.post(`/admin/courses/${id}/reject/`)
+  },
 }

@@ -138,6 +138,15 @@ class PublishedCourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'is_published', 'status']
 
 
+class AdminCourseSerializer(serializers.ModelSerializer):
+    teacher = TeacherDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Course
+        fields = ['id', 'title', 'teacher', 'status', 'is_published']
+        read_only_fields = ['id', 'title', 'teacher', 'is_published']
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     city_detail = CitySerializer(source='city', read_only=True)
