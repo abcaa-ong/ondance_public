@@ -8,7 +8,7 @@
       <q-card-section class="text-center q-py-xl">
         <q-icon name="play_circle" size="48px" style="color: var(--od-text-5);" />
         <p style="margin-top: 12px; color: var(--od-text-3);">Suas matrículas aparecerão aqui</p>
-        <q-btn unelevated no-caps label="Explorar cursos" to="/aluno/explorar"
+        <q-btn unelevated no-caps label="Explorar cursos" to="/student/explorar"
           style="background: var(--od-accent); color: #fff; border-radius: 8px; margin-top: 8px;" />
       </q-card-section>
     </q-card>
