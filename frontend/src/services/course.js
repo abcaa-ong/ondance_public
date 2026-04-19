@@ -41,4 +41,9 @@ export const courseService = {
   reject(id) {
     return api.post(`/admin/courses/${id}/reject/`)
   },
+
+  students({ courseId = null } = {}) {
+    const params = courseId ? { course_id: courseId } : {}
+    return api.get('/teacher/students/', { params })
+  },
 }
