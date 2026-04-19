@@ -90,7 +90,7 @@ const navSections = [
     label: 'Plataforma',
     items: [
       { to: '/admin/overview',   icon: 'dashboard',      label: 'Visão Geral' },
-      { to: '/admin/cursos',     icon: 'fact_check',     label: 'Aprovar Cursos' },
+      { to: '/admin/courses',     icon: 'fact_check',     label: 'Aprovar Cursos' },
       { to: '/admin/usuarios',   icon: 'manage_accounts', label: 'Usuários' },
       { to: '/admin/analytics',  icon: 'bar_chart',      label: 'Analytics' },
       { to: '/admin/categorias', icon: 'category',       label: 'Categorias' },
