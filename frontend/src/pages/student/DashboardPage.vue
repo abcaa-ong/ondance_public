@@ -21,13 +21,13 @@
           <q-card-section>
             <div class="row items-center justify-between q-mb-md">
               <div class="od-card-title od-display">Meus cursos</div>
-              <q-btn flat no-caps label="ver todos →" style="color: var(--od-accent); font-size: 12px;" to="/aluno/meus-cursos" />
+              <q-btn flat no-caps label="ver todos →" style="color: var(--od-accent); font-size: 12px;" to="/student/my-courses" />
             </div>
             <div
               v-for="course in activeCourses" :key="course.id"
               class="row items-center q-py-sm"
               :style="{ borderBottom: '0.5px solid var(--od-border-light)', gap: '12px', cursor: 'pointer' }"
-              @click="$router.push(`/aluno/cursos/${course.id}/assistir`)"
+              @click="$router.push(`/student/courses/${course.id}/assistir`)"
             >
               <div class="od-course-thumb" :style="{ background: course.thumbBg }">{{ course.emoji }}</div>
               <div style="flex: 1; min-width: 0;">
@@ -53,7 +53,7 @@
             <div style="font-size: 12px; color: rgba(255,255,255,0.75);">32 min · Vídeo + Exercício</div>
             <q-btn unelevated no-caps label="▶  Continuar" class="full-width q-mt-md"
               style="background: rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-weight: 500;"
-              to="/aluno/cursos/1/assistir" />
+              to="/student/courses/1/assistir" />
           </q-card-section>
         </q-card>
 

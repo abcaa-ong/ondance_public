@@ -322,7 +322,7 @@ async function handleSubmit () {
   try {
     await courseService.create({ title: form.value.title })
     $q.notify({ type: 'positive', message: 'Curso publicado com sucesso!', position: 'top', timeout: 2500 })
-    router.push('/professor/cursos')
+    router.push('/teacher/courses')
   } catch (err) {
     const msg = err.response?.data
       ? Object.values(err.response.data).flat().join(' ')
