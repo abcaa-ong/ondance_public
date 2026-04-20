@@ -6,3 +6,5 @@ frontend/.claude/
 .claude/settings.local.json
 backend/media/
 CLAUDE.md
+staticfiles/
+media/
