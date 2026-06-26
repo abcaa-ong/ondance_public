@@ -121,17 +121,17 @@ const navSections = [
   {
     label: null,
     items: [
-      { to: '/student/dashboard',    icon: 'dashboard',         label: 'Dashboard' },
-      { to: '/student/my-courses',  icon: 'play_circle',       label: 'Meus Cursos' },
-      { to: '/student/explorar',     icon: 'explore',           label: 'Explorar' },
+      { to: '/student/dashboard', icon: 'dashboard', label: 'Dashboard' },
+      { to: '/student/my-courses', icon: 'play_circle', label: 'Meus Cursos' },
+      { to: '/student/explorar', icon: 'explore', label: 'Explorar' },
       { to: '/student/certificados', icon: 'workspace_premium', label: 'Certificados' },
     ]
   },
   {
     label: 'Gestão',
     items: [
-      { to: '/courses/students',       icon: 'group',            label: 'Students' },
-      { to: '/courses/configuracoes',icon: 'settings',         label: 'Configurações' }
+      { to: '/courses/students', icon: 'group', label: 'Students' },
+      { to: '/perfil',icon: 'settings', label: 'Perfil Aluno' }
     ]
   }
 ]

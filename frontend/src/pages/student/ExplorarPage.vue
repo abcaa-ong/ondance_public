@@ -62,7 +62,7 @@
         class="od-card od-course-card"
         style="width: 280px; cursor: pointer; transition: box-shadow 0.15s;"
       >
-        <q-card-section style="padding: 16px;">
+        <q-card-section style="padding: 16px;" @click="onCourseClick(course)">
 
           <!-- Avatar do professor -->
           <div class="row items-center q-mb-md" style="gap: 10px;">
@@ -103,17 +103,51 @@
       </q-card>
     </div>
 
+    <!-- Enroll dialog -->
+    <q-dialog v-model="showEnrollDialog">
+      <q-card flat bordered class="od-card" style="width: 400px; max-width: 90vw;">
+        <q-card-section>
+          <div class="od-display" style="font-size: 18px; color: var(--od-text-1);">{{ selectedCourse?.title }}</div>
+          <p style="color: var(--od-text-3); margin-top: 6px; font-size: 14px;">
+            Por {{ selectedCourse?.teacher?.name || selectedCourse?.teacher?.email }}
+          </p>
+          <p v-if="selectedCourse?.description" style="color: var(--od-text-2); margin-top: 8px; font-size: 13px;">
+            {{ selectedCourse.description }}
+          </p>
+          <div class="row q-mt-sm" style="gap: 12px; font-size: 12px; color: var(--od-text-4);">
+            <span v-if="selectedCourse?.level">{{ selectedCourse.level }}</span>
+            <span v-if="selectedCourse?.duration">{{ selectedCourse.duration }}</span>
+            <span v-if="selectedCourse?.lessons_count">{{ selectedCourse.lessons_count }} aula{{ selectedCourse.lessons_count !== 1 ? 's' : '' }}</span>
+          </div>
+        </q-card-section>
+        <q-card-actions align="right" style="padding: 8px 16px 16px;">
+          <q-btn flat no-caps label="Cancelar" v-close-popup style="color: var(--od-text-4);" />
+          <q-btn
+            unelevated no-caps label="Inscrever-se"
+            :loading="enrolling"
+            @click="enroll"
+            style="background: var(--od-accent); color: #fff; border-radius: 8px;"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
   </q-page>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { courseService } from 'src/services/course'
 
+const router = useRouter()
 const courses = ref([])
 const loading = ref(true)
 const error = ref(false)
 const search = ref('')
+const showEnrollDialog = ref(false)
+const selectedCourse = ref(null)
+const enrolling = ref(false)
 
 const filtered = computed(() => {
   const q = search.value.trim().toLowerCase()
@@ -141,6 +175,28 @@ async function load () {
 function initials (str) {
   if (!str) return '?'
   return str.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+}
+
+function onCourseClick(course) {
+  selectedCourse.value = course
+  showEnrollDialog.value = true
+}
+
+async function enroll() {
+  if (!selectedCourse.value) return
+  enrolling.value = true
+  try {
+    await courseService.enroll(selectedCourse.value.id)
+    showEnrollDialog.value = false
+    router.push(`/student/courses/${selectedCourse.value.id}/assistir`)
+  } catch (e) {
+    if (e.response?.status === 409) {
+      showEnrollDialog.value = false
+      router.push(`/student/courses/${selectedCourse.value.id}/assistir`)
+    }
+  } finally {
+    enrolling.value = false
+  }
 }
 
 onMounted(load)

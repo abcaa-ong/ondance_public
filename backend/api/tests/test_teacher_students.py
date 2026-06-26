@@ -65,6 +65,7 @@ def test_retorna_campos_corretos(api_client, teacher, enrollment):
     assert set(item.keys()) == {
         'id', 'student_name', 'student_email', 'student_photo',
         'course_id', 'course_title', 'started_at', 'is_completed',
+        'progress_percent',
     }
 
 

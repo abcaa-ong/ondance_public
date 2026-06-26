@@ -9,14 +9,16 @@
 
 > Sem player, a plataforma é só um catálogo. Este sprint entrega o CORE do produto.
 
-- [ ] Player de vídeo (play/pausa/avançar/voltar)
-- [ ] Continuar de onde parou (save/restore posição do vídeo)
-- [ ] Marcar aula como concluída
-- [ ] Formato das aulas: texto explicativo (campo no modelo Lesson)
-- [ ] Formato das aulas: materiais extras/PDF (campo no modelo Lesson)
+- [x] Player de vídeo (play/pausa/avançar/voltar)
+- [x] Continuar de onde parou (save/restore posição do vídeo)
+- [x] Marcar aula como concluída
+- [x] Formato das aulas: texto explicativo (campo no modelo Lesson)
+- [x] Formato das aulas: materiais extras/PDF (campo no modelo Lesson)
 - [ ] Formato das aulas: exercícios/atividades (campo no modelo Lesson)
-- [ ] Página "Assistir aula" real (trocar placeholder)
-- [ ] Assistir aulas (trocar placeholder no perfil do aluno)
+- [x] Página "Assistir aula" real (trocar placeholder)
+- [x] Assistir aulas (trocar placeholder no perfil do aluno)
+- [x] Fluxo de inscrição no catálogo (ExplorarPage → modal → AssistirPage)
+- [x] MyCoursesPage com dados reais (lista de matrículas + progresso)
 
 **Itens do checklist atendidos:** Seção 10, 11, 12
 
@@ -26,8 +28,8 @@
 
 > Recompensa pelo engajamento. Recuperação de senha é UX crítico que ficou para trás.
 
-- [ ] Progresso do aluno — backend (UserCourse + LessonProgress)
-- [ ] Progresso do aluno — frontend (%) e aulas assistidas/total
+- [x] Progresso do aluno — backend (UserCourse + LessonProgress)
+- [x] Progresso do aluno — frontend (%) e aulas assistidas/total
 - [ ] Campo carga horária no modelo Course
 - [ ] API de certificados
 - [ ] Geração automática de certificado ao concluir curso

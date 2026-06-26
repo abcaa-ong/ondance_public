@@ -17,7 +17,7 @@
 
 - [x] Plataforma digital de ensino de dança online
 - [x] Aluno entra na plataforma, escolhe curso, assiste aulas
-- [ ] Aprende no seu ritmo (player com progresso real)
+- [x] Aprende no seu ritmo (player com progresso real)
 - [ ] Recebe certificado ao concluir
 - [x] Plataforma simples, intuitiva e acessível
 - [ ] Marketplace de aulas presenciais, eventos, produtos (fase futura — correto adiar)
@@ -36,8 +36,8 @@
 
 - [x] Criar conta
 - [x] Acessar cursos
-- [ ] Assistir aulas (placeholder)
-- [ ] Acompanhar progresso (placeholder)
+- [x] Assistir aulas (player de vídeo com YouTube/embed e HTML5 nativo)
+- [x] Acompanhar progresso (LessonProgress com % e aulas concluídas)
 - [ ] Receber certificados (não implementado)
 
 ### Professor
@@ -113,20 +113,20 @@
 
 ## 10. Formato das Aulas
 
-- [ ] Vídeo (modelo tem `video_url`, mas player é placeholder)
-- [ ] Texto explicativo (não implementado no modelo)
-- [ ] Materiais extras / PDF (não implementado)
+- [x] Vídeo (player HTML5 nativo + YouTube/Vimeo embed)
+- [x] Texto explicativo (campo `content` no modelo Lesson)
+- [x] Materiais extras / PDF (campo `materials_url` no modelo Lesson)
 - [ ] Exercícios / atividades (não implementado)
 
 ## 11. Player de Aula
 
-- [ ] Play / Pausa / Avançar / Voltar
-- [ ] Continuar de onde parou
-- [ ] Marcar aula como concluída
+- [x] Play / Pausa / Avançar / Voltar
+- [x] Continuar de onde parou
+- [x] Marcar aula como concluída
 
 ## 12. Continuar de Onde Parou
 
-- [ ] Função essencial — salvar e restaurar ponto do vídeo
+- [x] Função essencial — salvar e restaurar ponto do vídeo
 
 ## 13. Trilha de Conhecimento
 
@@ -160,8 +160,8 @@
 
 ## 17. Área do Aluno
 
-- [x] Meus cursos (em andamento) — placeholder
-- [ ] Cursos concluídos — placeholder
+- [x] Meus cursos (em andamento) — dados reais via API
+- [x] Cursos concluídos — exibidos no MyCoursesPage
 - [ ] Certificados — placeholder
 - [x] Perfil — implementado
 
@@ -256,10 +256,10 @@
 | Sistema de login | ✅ Implementado |
 | Perfil de usuário | ✅ Implementado |
 | Catálogo de cursos | ⚠️ Parcial — faltam filtros |
-| Player de vídeo | ❌ Placeholder |
-| Sistema de progresso | ❌ Placeholder |
+| Player de vídeo | ✅ Implementado |
+| Sistema de progresso | ✅ Implementado |
 | Sistema de trilhas | ❌ Não implementado |
-| Área do aluno | ⚠️ Parcial (dashboard + explorar) |
+| Área do aluno | ⚠️ Parcial (dashboard, explorar, assistir, meus cursos) |
 | Área do professor | ⚠️ Parcial (CRUD cursos + alunos) |
 | Certificados digitais | ❌ Modelo existe, sem API/geração |
 | Sistema de notificações | ❌ Só ícone UI |
@@ -274,7 +274,7 @@
 
 | Status | Quantidade |
 |--------|------------|
-| ✅ Implementado | 41 |
-| ⚠️ Parcial | 5 |
-| ❌ Não implementado | 47 |
+| ✅ Implementado | 49 |
+| ⚠️ Parcial | 4 |
+| ❌ Não implementado | 40 |
 | **Total** | **93** |

@@ -28,10 +28,10 @@
               </div>
               <q-separator />
               <q-list style="padding: 4px;">
-                <q-item clickable v-close-popup to="/perfil" class="user-menu-item">
+                <!-- <q-item clickable v-close-popup to="/perfil" class="user-menu-item">
                   <q-item-section avatar style="min-width: 32px;"><q-icon name="person_outline" size="16px" /></q-item-section>
                   <q-item-section>Meu perfil</q-item-section>
-                </q-item>
+                </q-item> -->
                 <q-item clickable v-close-popup @click="handleLogout" class="user-menu-item user-menu-logout">
                   <q-item-section avatar style="min-width: 32px;"><q-icon name="logout" size="16px" /></q-item-section>
                   <q-item-section>Sair</q-item-section>
@@ -90,17 +90,18 @@ const navSections = [
   {
     label: null,
     items: [
-      { to: '/teacher/dashboard',    icon: 'dashboard',     label: 'Dashboard'   },
-      { to: '/teacher/courses',      icon: 'video_library', label: 'Meus Cursos' },
-      { to: '/teacher/courses/new',  icon: 'add_circle',    label: 'Criar Curso' },
-      { to: '/teacher/students',     icon: 'group',         label: 'Meus Alunos' },
+      { to: '/teacher/dashboard', icon: 'dashboard', label: 'Dashboard'   },
+      { to: '/teacher/courses', icon: 'video_library', label: 'Meus Cursos' },      
+      { to: '/teacher/students', icon: 'group', label: 'Meus Alunos' },
+      { to: '/teacher/config', icon: 'settings', label: 'Avaliações' },
+      { to: '/teacher/config', icon: 'settings', label: 'Progresso dos alunos' },
+      { to: '/teacher/perfil', icon: 'profile', label: 'Perfil' },      
     ]
   },
   {
     label: 'Finanças',
     items: [
-      { to: '/teacher/ganhos', icon: 'payments', label: 'Ganhos' },
-      { to: '/teacher/config', icon: 'settings', label: 'Configurações' },
+      { to: '/teacher/ganhos', icon: 'payments', label: 'Ganhos' },      
     ]
   }
 ]

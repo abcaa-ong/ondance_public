@@ -11,17 +11,19 @@
 
 ### Sprint MVP-1 (semanas 1-2) — Player + Formato das Aulas
 
-- [ ] Player de vídeo (play/pausa/avançar/voltar)
-- [ ] Continuar de onde parou (save/restore posição do vídeo)
-- [ ] Marcar aula como concluída
-- [ ] Campo texto explicativo no modelo Lesson
-- [ ] Página "Assistir aula" real (trocar placeholder)
-- [ ] Assistir aulas (trocar placeholder no perfil do aluno)
+- [x] Player de vídeo (play/pausa/avançar/voltar)
+- [x] Continuar de onde parou (save/restore posição do vídeo)
+- [x] Marcar aula como concluída
+- [x] Campo texto explicativo no modelo Lesson
+- [x] Página "Assistir aula" real (trocar placeholder)
+- [x] Assistir aulas (trocar placeholder no perfil do aluno)
+- [x] Fluxo de inscrição no catálogo (ExplorarPage → modal → AssistirPage)
+- [x] MyCoursesPage com dados reais (lista de matrículas + progresso)
 
 ### Sprint MVP-2 (semanas 3-4) — Progresso + Certificados + Recuperação de Senha
 
-- [ ] Progresso do aluno — backend (UserCourse + LessonProgress)
-- [ ] Progresso do aluno — frontend (%) e aulas assistidas/total
+- [x] Progresso do aluno — backend (UserCourse + LessonProgress)
+- [x] Progresso do aluno — frontend (%) e aulas assistidas/total
 - [ ] Campo carga horária no modelo Course
 - [ ] API de certificados
 - [ ] Geração automática de certificado ao concluir curso

@@ -29,6 +29,22 @@ export const courseService = {
     return api.get('/courses/published/')
   },
 
+  enroll(courseId) {
+    return api.post(`/courses/${courseId}/enroll/`)
+  },
+
+  study(courseId) {
+    return api.get(`/courses/${courseId}/study/`)
+  },
+
+  saveProgress(courseId, lessonId, data) {
+    return api.post(`/courses/${courseId}/lessons/${lessonId}/progress/`, data)
+  },
+
+  enrollments() {
+    return api.get('/enrollments/')
+  },
+
   adminList(status = null) {
     const params = status ? { status } : {}
     return api.get('/admin/courses/', { params })

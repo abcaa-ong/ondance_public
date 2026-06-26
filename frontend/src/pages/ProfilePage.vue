@@ -4,6 +4,7 @@
     <!-- Header -->
     <div class="q-mb-lg">
       <div class="od-display" style="font-size: 24px; color: var(--od-text-1);">Meu Perfil</div>
+      <div class="od-display" style="font-size: 24px; color: var(--od-text-1);">Perfil do Aluno</div>
       <p style="color: var(--od-text-3); margin: 4px 0 0; font-size: 14px;">Gerencie suas informações pessoais</p>
     </div>
 
@@ -39,23 +40,19 @@
       <div class="col">
         <q-card flat bordered class="od-card">
           <q-card-section>
-
             <div class="form-grid">
-
               <q-input
                 :model-value="form.email"
                 label="E-mail"
                 outlined dense disable
                 :style="inputStyle"
               />
-
               <q-input
                 v-model="form.name"
                 label="Nome completo"
                 outlined dense
                 :style="inputStyle"
               />
-
               <q-select
                 v-model="selectedState"
                 :options="stateOptions"
@@ -66,7 +63,6 @@
                 :style="inputStyle"
                 @update:model-value="onStateChange"
               />
-
               <q-input
                 v-model="form.celular"
                 label="Celular"
@@ -75,7 +71,6 @@
                 unmasked-value
                 :style="inputStyle"
               />
-
               <q-input
                 v-model="form.telephone"
                 label="Telefone"
@@ -84,7 +79,6 @@
                 unmasked-value
                 :style="inputStyle"
               />
-
               <q-input
                 v-model="form.birthday"
                 label="Data de nascimento"
@@ -93,7 +87,6 @@
                 stack-label
                 :style="inputStyle"
               />
-
               <q-select
                 v-model="form.city"
                 :options="filteredCityOptions"
@@ -108,15 +101,11 @@
                 :style="inputStyle"
                 @filter="filterCities"
               />
-
             </div>
-
             <div v-if="errorMsg" style="margin-top: 12px; font-size: 13px; color: #e53935;">
               {{ errorMsg }}
             </div>
-
           </q-card-section>
-
           <q-card-actions class="q-px-md q-pb-md">
             <q-space />
             <q-btn
@@ -129,7 +118,6 @@
           </q-card-actions>
         </q-card>
       </div>
-
     </div>
   </q-page>
 </template>

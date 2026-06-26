@@ -5,7 +5,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from course.models import Course, Lesson, Module, UserCourse
+from course.models import Course, Lesson, LessonProgress, Module, UserCourse
 from user.models import City, Profile, State, User
 
 
@@ -104,7 +104,46 @@ class CitySerializer(serializers.ModelSerializer):
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'video_url', 'order']
+        fields = ['id', 'title', 'video_url', 'content', 'materials_url', 'order']
+
+
+class LessonProgressSerializer(serializers.ModelSerializer):
+    lesson_id = serializers.UUIDField(source='lesson.id', read_only=True)
+
+    class Meta:
+        model = LessonProgress
+        fields = ['id', 'lesson_id', 'is_completed', 'video_position', 'last_watched_at']
+
+
+class StudyLessonSerializer(serializers.ModelSerializer):
+    progress = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Lesson
+        fields = ['id', 'title', 'video_url', 'content', 'materials_url', 'order', 'progress']
+
+    def get_progress(self, obj):
+        progress_map = self.context.get('progress_map', {})
+        progress = progress_map.get(str(obj.id))
+        if progress:
+            return {
+                'is_completed': progress.is_completed,
+                'video_position': progress.video_position,
+                'last_watched_at': progress.last_watched_at,
+            }
+        return {
+            'is_completed': False,
+            'video_position': 0,
+            'last_watched_at': None,
+        }
+
+
+class StudyModuleSerializer(serializers.ModelSerializer):
+    lessons = StudyLessonSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Module
+        fields = ['id', 'title', 'order', 'lessons']
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -136,6 +175,8 @@ class ModuleSerializer(serializers.ModelSerializer):
                 lesson = existing_lessons[str(lesson_id)]
                 lesson.title = lesson_data.get('title', lesson.title)
                 lesson.video_url = lesson_data.get('video_url', lesson.video_url)
+                lesson.content = lesson_data.get('content', lesson.content)
+                lesson.materials_url = lesson_data.get('materials_url', lesson.materials_url)
                 lesson.order = lesson_data.get('order', lesson.order)
                 lesson.save()
                 incoming_ids.add(str(lesson_id))
@@ -242,6 +283,8 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                         lesson = existing_lessons[str(lesson_id)]
                         lesson.title = lesson_data.get('title', lesson.title)
                         lesson.video_url = lesson_data.get('video_url', lesson.video_url)
+                        lesson.content = lesson_data.get('content', lesson.content)
+                        lesson.materials_url = lesson_data.get('materials_url', lesson.materials_url)
                         lesson.order = lesson_data.get('order', lesson.order)
                         lesson.save()
                         lesson_incoming_ids.add(str(lesson_id))
@@ -313,6 +356,7 @@ class TeacherStudentSerializer(serializers.ModelSerializer):
     student_photo = serializers.SerializerMethodField()
     course_id = serializers.UUIDField(source='course.id', read_only=True)
     course_title = serializers.CharField(source='course.title', read_only=True)
+    progress_percent = serializers.SerializerMethodField()
 
     def get_student_name(self, obj):
         return obj.profile.name or ''
@@ -326,12 +370,66 @@ class TeacherStudentSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         return request.build_absolute_uri(obj.profile.photo.url) if request else obj.profile.photo.url
 
+    def get_progress_percent(self, obj):
+        total_lessons = Lesson.objects.filter(module__course=obj.course).count()
+        if total_lessons == 0:
+            return 0
+        completed = obj.lesson_progress.filter(is_completed=True).count()
+        return round(completed / total_lessons * 100)
+
     class Meta:
         model = UserCourse
         fields = [
             'id', 'student_name', 'student_email', 'student_photo',
             'course_id', 'course_title', 'started_at', 'is_completed',
+            'progress_percent',
         ]
+
+
+class StudyCourseSerializer(serializers.ModelSerializer):
+    teacher = TeacherDetailSerializer(read_only=True)
+    modules = StudyModuleSerializer(many=True, read_only=True)
+    progress_percent = serializers.SerializerMethodField()
+    is_enrolled = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Course
+        fields = [
+            'id', 'title', 'description', 'duration', 'level',
+            'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
+            'modules', 'progress_percent', 'is_enrolled',
+        ]
+
+    def get_progress_percent(self, obj):
+        progress_percent = self.context.get('progress_percent', 0)
+        return progress_percent
+
+    def get_is_enrolled(self, obj):
+        return True
+
+
+class EnrollmentSerializer(serializers.ModelSerializer):
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    progress_percent = serializers.SerializerMethodField()
+
+    def get_progress_percent(self, obj):
+        total_lessons = Lesson.objects.filter(module__course=obj.course).count()
+        if total_lessons == 0:
+            return 0
+        completed = obj.lesson_progress.filter(is_completed=True).count()
+        return round(completed / total_lessons * 100)
+
+    class Meta:
+        model = UserCourse
+        fields = [
+            'id', 'course', 'course_title', 'started_at',
+            'completed_at', 'is_completed', 'progress_percent',
+        ]
+
+
+class SaveProgressSerializer(serializers.Serializer):
+    video_position = serializers.IntegerField(min_value=0, required=False)
+    is_completed = serializers.BooleanField(required=False)
 
 
 class AdminUserSerializer(serializers.ModelSerializer):

@@ -13,6 +13,9 @@ from api.serializers import (
     AdminUserSerializer,
     CitySerializer,
     CourseDetailSerializer,
+    EnrollmentSerializer,
+    SaveProgressSerializer,
+    StudyCourseSerializer,
     TeacherStudentSerializer,
     CourseSerializer,
     GoogleSocialAuthSerializer,
@@ -23,7 +26,7 @@ from api.serializers import (
     UserSerializer,
 )
 from api.throttles import RegisterThrottle, SocialAuthThrottle
-from course.models import Course, UserCourse
+from course.models import Course, Lesson, LessonProgress, UserCourse
 from user.models import City, Profile, State, User
 
 
@@ -340,3 +343,143 @@ class ProfileListView(generics.ListAPIView):
 
 
 profile_list = ProfileListView.as_view()
+
+
+class CourseEnrollView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        course = get_object_or_404(Course, pk=pk, is_published=True)
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        enrollment, created = UserCourse.objects.get_or_create(
+            profile=profile,
+            course=course,
+        )
+        if not created:
+            return Response(
+                {'message': 'Você já está matriculado neste curso.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+        serializer = EnrollmentSerializer(enrollment, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+course_enroll = CourseEnrollView.as_view()
+
+
+class CourseStudyView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        course = get_object_or_404(
+            Course.objects.select_related('teacher__profile').prefetch_related('modules__lessons'),
+            pk=pk,
+            is_published=True,
+        )
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        try:
+            enrollment = UserCourse.objects.get(profile=profile, course=course)
+        except UserCourse.DoesNotExist:
+            return Response(
+                {'message': 'Você não está matriculado neste curso.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        progress_qs = LessonProgress.objects.filter(
+            user_course=enrollment
+        ).select_related('lesson')
+        progress_map = {str(lp.lesson_id): lp for lp in progress_qs}
+
+        total_lessons = Lesson.objects.filter(module__course=course).count()
+        completed = sum(1 for lp in progress_qs if lp.is_completed)
+        progress_percent = round(completed / total_lessons * 100) if total_lessons else 0
+
+        serializer = StudyCourseSerializer(
+            course,
+            context={
+                'request': request,
+                'progress_map': progress_map,
+                'progress_percent': progress_percent,
+            },
+        )
+        return Response(serializer.data)
+
+
+course_study = CourseStudyView.as_view()
+
+
+class LessonProgressView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, course_id, lesson_id):
+        course = get_object_or_404(Course, pk=course_id)
+        lesson = get_object_or_404(Lesson, pk=lesson_id)
+
+        if not Lesson.objects.filter(pk=lesson_id, module__course=course).exists():
+            return Response(
+                {'message': 'Esta aula não pertence a este curso.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        try:
+            enrollment = UserCourse.objects.get(profile=profile, course=course)
+        except UserCourse.DoesNotExist:
+            return Response(
+                {'message': 'Você não está matriculado neste curso.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = SaveProgressSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        progress, created = LessonProgress.objects.get_or_create(
+            user_course=enrollment,
+            lesson=lesson,
+        )
+
+        if 'video_position' in serializer.validated_data:
+            progress.video_position = serializer.validated_data['video_position']
+        if 'is_completed' in serializer.validated_data:
+            progress.is_completed = serializer.validated_data['is_completed']
+        progress.save()
+
+        total_lessons = Lesson.objects.filter(module__course=course).count()
+        all_completed = (
+            LessonProgress.objects
+            .filter(user_course=enrollment, is_completed=True)
+            .count()
+        )
+
+        if total_lessons > 0 and all_completed >= total_lessons:
+            from django.utils import timezone
+            enrollment.is_completed = True
+            enrollment.completed_at = timezone.now()
+            enrollment.save()
+
+        return Response({
+            'is_completed': progress.is_completed,
+            'video_position': progress.video_position,
+            'last_watched_at': progress.last_watched_at,
+            'course_completed': enrollment.is_completed,
+        })
+
+
+lesson_progress = LessonProgressView.as_view()
+
+
+class StudentEnrollmentsView(generics.ListAPIView):
+    serializer_class = EnrollmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return (
+            UserCourse.objects
+            .select_related('course__teacher__profile')
+            .filter(profile=profile)
+            .order_by('-started_at')
+        )
+
+
+student_enrollments = StudentEnrollmentsView.as_view()

@@ -46,6 +46,8 @@ class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=200)
     video_url = models.URLField(blank=True, default='')
+    content = models.TextField(blank=True, default='')
+    materials_url = models.URLField(blank=True, default='')
     order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -73,6 +75,26 @@ class UserCourse(models.Model):
         verbose_name = "Progresso"
         verbose_name_plural = "Progressos"
         ordering = ['-started_at']
+
+
+class LessonProgress(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_course = models.ForeignKey(UserCourse, on_delete=models.CASCADE, related_name='lesson_progress')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='progress_entries')
+    is_completed = models.BooleanField(default=False)
+    video_position = models.PositiveIntegerField(default=0)
+    last_watched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Progresso da Aula"
+        verbose_name_plural = "Progressos das Aulas"
+        constraints = [
+            models.UniqueConstraint(fields=['user_course', 'lesson'], name='unique_lesson_progress'),
+        ]
+
+    def __str__(self):
+        status = 'concluída' if self.is_completed else f'{self.video_position}s'
+        return f"{self.user_course.profile.name} — {self.lesson.title} ({status})"
 
 
 class Certificate(models.Model):

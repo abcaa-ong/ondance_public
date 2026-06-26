@@ -135,19 +135,31 @@
                     <div
                       v-for="(lesson, lIdx) in mod.lessons"
                       :key="lesson.id"
-                      class="row items-center q-px-sm q-py-xs"
-                      :style="{ borderTop: '0.5px solid var(--od-border-light)', gap: '8px' }"
+                      class="q-px-sm q-py-xs"
+                      :style="{ borderTop: '0.5px solid var(--od-border-light)' }"
                     >
-                      <q-icon name="play_circle_outline" size="14px" :style="{ color: 'var(--od-text-5)', marginLeft: '16px' }" />
-                      <q-input
-                        v-model="lesson.title"
-                        borderless dense
-                        :placeholder="`Aula ${lIdx + 1}`"
-                        class="col"
-                        style="font-size: 12.5px;"
-                        :input-style="{ color: 'var(--od-text-2)', padding: '0' }"
-                      />
-                      <q-btn flat round dense icon="close" size="xs" :style="{ color: 'var(--od-text-5)' }" @click="removeLesson(mod, lIdx)" />
+                      <div class="row items-center" style="gap: 8px;">
+                        <q-icon name="play_circle_outline" size="14px" :style="{ color: 'var(--od-text-5)', marginLeft: '16px' }" />
+                        <q-input
+                          v-model="lesson.title"
+                          borderless dense
+                          :placeholder="`Aula ${lIdx + 1}`"
+                          class="col"
+                          style="font-size: 12.5px;"
+                          :input-style="{ color: 'var(--od-text-2)', padding: '0' }"
+                        />
+                        <q-btn flat round dense icon="close" size="xs" :style="{ color: 'var(--od-text-5)' }" @click="removeLesson(mod, lIdx)" />
+                      </div>
+                      <div class="row" style="gap: 6px; margin-left: 30px; margin-top: 2px;">
+                        <q-input
+                          v-model="lesson.video_url"
+                          borderless dense
+                          placeholder="URL do vídeo (YouTube, Vimeo...)"
+                          class="col"
+                          style="font-size: 11.5px;"
+                          :input-style="{ color: 'var(--od-text-3)', padding: '0' }"
+                        />
+                      </div>
                     </div>
 
                     <div
@@ -318,6 +330,9 @@ onMounted(async () => {
       lessons: (m.lessons || []).map((l) => ({
         id: l.id,
         title: l.title,
+        video_url: l.video_url || '',
+        content: l.content || '',
+        materials_url: l.materials_url || '',
       })),
     }))
   } catch (err) {
@@ -340,7 +355,7 @@ function removeModule (mIdx) {
 }
 
 function addLesson (mod) {
-  mod.lessons.push({ id: nextId++, title: '' })
+  mod.lessons.push({ id: nextId++, title: '', video_url: '', content: '', materials_url: '' })
 }
 
 function removeLesson (mod, lIdx) {
@@ -362,6 +377,9 @@ async function handleSubmit () {
         lessons: m.lessons.map((l, lidx) => ({
           id: l.id || undefined,
           title: l.title,
+          video_url: l.video_url || '',
+          content: l.content || '',
+          materials_url: l.materials_url || '',
           order: lidx,
         })),
       })),

@@ -28,6 +28,7 @@ const teacherRoutes = {
     { path: 'students',            name: 'teacher-students',  component: () => import('pages/teacher/StudentsPage.vue') },
     { path: 'ganhos',              name: 'teacher-ganhos',    component: () => import('pages/teacher/GanhosPage.vue') },
     { path: 'config',              name: 'teacher-config',    component: () => import('pages/teacher/ConfigPage.vue') },
+    { path: 'perfil', name: 'teacher-perfil', component: () => import('pages/ProfilePage.vue') },
   ]
 }
 
