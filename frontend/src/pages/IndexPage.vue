@@ -242,7 +242,87 @@
       </div>
     </section>
 
-    <!-- ── Seção 5: CTA Final + Footer ───────────────── -->
+    <!-- ── Seção 5: Professores ─────────────────────── -->
+    <section class="teachers-section">
+      <div class="section-container">
+        <div class="section-header">
+          <h2 class="section-title">Nossos Professores</h2>
+          <p class="section-desc">Aprenda com profissionais experientes e apaixonados por dança</p>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="loadingTeachers" class="teachers-loading">
+          <q-spinner-dots color="var(--od-accent)" size="40px" />
+        </div>
+
+        <!-- Empty state -->
+        <div v-else-if="teachers.length === 0" class="teachers-empty">
+          <q-icon name="groups" size="48px" style="color: var(--od-text-5);" />
+          <p>Em breve nossos professores por aqui</p>
+        </div>
+
+        <!-- Grid de professores -->
+        <div v-else class="teachers-grid">
+          <div
+            v-for="teacher in teachers.slice(0, 6)"
+            :key="teacher.id"
+            class="teacher-card od-card"
+          >
+            <q-avatar size="64px" class="teacher-avatar">
+              <img v-if="teacher.photo" :src="teacher.photo" :alt="teacher.name" />
+              <div
+                v-else
+                class="row items-center justify-center full-width full-height"
+                style="background: var(--od-accent); color: #fff; font-size: 24px; font-weight: 600; border-radius: 50%;"
+              >
+                {{ initials(teacher.name || teacher.email) }}
+              </div>
+            </q-avatar>
+            <div class="teacher-name">{{ teacher.name || teacher.email }}</div>
+            <div class="teacher-role">Professor</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Seção 6: Depoimentos ─────────────────────── -->
+    <section class="testimonials-section">
+      <div class="section-container">
+        <div class="section-header">
+          <h2 class="section-title">O que dizem nossos alunos</h2>
+          <p class="section-desc">Histórias reais de quem já transformou sua vida através da dança</p>
+        </div>
+
+        <div class="testimonials-grid">
+          <div
+            v-for="testimonial in testimonials"
+            :key="testimonial.name"
+            class="testimonial-card od-card"
+          >
+            <div class="testimonial-stars">
+              <q-icon v-for="n in 5" :key="n" name="star" size="16px" style="color: #f59e0b;" />
+            </div>
+            <p class="testimonial-text">"{{ testimonial.text }}"</p>
+            <div class="testimonial-author">
+              <q-avatar size="40px">
+                <div
+                  class="row items-center justify-center full-width full-height"
+                  :style="{ background: testimonial.color, color: '#fff', fontSize: '14px', fontWeight: '600', borderRadius: '50%' }"
+                >
+                  {{ initials(testimonial.name) }}
+                </div>
+              </q-avatar>
+              <div>
+                <div class="testimonial-name">{{ testimonial.name }}</div>
+                <div class="testimonial-course">{{ testimonial.course }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Seção 7: CTA Final + Footer ───────────────── -->
     <section class="cta-section">
       <div class="section-container cta-container">
         <h2 class="cta-title">Pronto para começar?</h2>
@@ -293,6 +373,8 @@ const currentYear = new Date().getFullYear()
 
 const loadingCourses = ref(false)
 const featuredCourses = ref([])
+const loadingTeachers = ref(false)
+const teachers = ref([])
 
 async function fetchFeaturedCourses() {
   loadingCourses.value = true
@@ -307,7 +389,20 @@ async function fetchFeaturedCourses() {
   }
 }
 
+async function fetchTeachers() {
+  loadingTeachers.value = true
+  try {
+    const res = await courseService.teachers()
+    teachers.value = res.data?.results ?? res.data ?? []
+  } catch {
+    teachers.value = []
+  } finally {
+    loadingTeachers.value = false
+  }
+}
+
 onMounted(() => {
+  fetchTeachers()
   if (isAuthenticated.value) fetchFeaturedCourses()
   initGoogleButton('google-signup-btn', {
     getRole: () => quickForm.value.role,
@@ -381,6 +476,32 @@ const steps = [
   { number: '02', icon: 'school',        title: 'Escolha um curso',      desc: 'Filtre por estilo, nível e professor. Encontre o ideal para você.' },
   { number: '03', icon: 'play_circle',   title: 'Aprenda no seu ritmo',  desc: 'Assista quando e onde quiser. Pause, repita, domine cada movimento.' },
 ]
+
+const testimonials = [
+  {
+    name: 'Ana Carolina',
+    course: 'Curso de Ballet',
+    text: 'Nunca imaginei que aprenderia ballet aos 30 anos. A plataforma é incrível, os vídeos são claros e posso assistir quantas vezes quiser.',
+    color: '#e91e8c',
+  },
+  {
+    name: 'Pedro Henrique',
+    course: 'Curso de Hip-Hop',
+    text: 'Os professores são muito talentosos. Consegui aprender coreografias completas no meu ritmo, sem pressão.',
+    color: '#8b5cf6',
+  },
+  {
+    name: 'Maria Silva',
+    course: 'Curso de Forró',
+    text: 'Melhor plataforma de dança que já usei! O progresso me mantém motivada e os certificados são um bônus incrível.',
+    color: '#06b6d4',
+  },
+]
+
+function initials (str) {
+  if (!str) return '?'
+  return str.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+}
 </script>
 
 <style scoped>
@@ -815,6 +936,116 @@ const steps = [
   margin: 0;
 }
 
+/* ── Professores ── */
+.teachers-section {
+  padding: 80px 0;
+}
+
+.teachers-loading,
+.teachers-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 0;
+  color: var(--od-text-3);
+  font-size: 14px;
+}
+
+.teachers-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+.teacher-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--od-border) !important;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+
+.teacher-card:hover {
+  border-color: var(--od-accent) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(233, 30, 140, 0.12);
+}
+
+.teacher-avatar {
+  flex-shrink: 0;
+}
+
+.teacher-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--od-text-1);
+}
+
+.teacher-role {
+  font-size: 12px;
+  color: var(--od-text-3);
+}
+
+/* ── Depoimentos ── */
+.testimonials-section {
+  padding: 80px 0;
+  background: var(--od-bg-surface);
+  border-top: 1px solid var(--od-border);
+  border-bottom: 1px solid var(--od-border);
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--od-border) !important;
+}
+
+.testimonial-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.testimonial-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--od-text-2);
+  margin: 0;
+  font-style: italic;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.testimonial-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--od-text-1);
+}
+
+.testimonial-course {
+  font-size: 12px;
+  color: var(--od-text-3);
+}
+
 /* ── CTA Final ── */
 .cta-section {
   padding: 80px 0;
@@ -1008,6 +1239,14 @@ const steps = [
   .courses-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .teachers-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 767px) {
@@ -1055,6 +1294,14 @@ const steps = [
   }
 
   .courses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .teachers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonials-grid {
     grid-template-columns: 1fr;
   }
 

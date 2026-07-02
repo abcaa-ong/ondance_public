@@ -25,8 +25,12 @@ export const courseService = {
     return api.get('/courses/mine/')
   },
 
-  published() {
-    return api.get('/courses/published/')
+  published(filters = {}) {
+    return api.get('/courses/published/', { params: filters })
+  },
+
+  teachers() {
+    return api.get('/teachers/')
   },
 
   enroll(courseId) {

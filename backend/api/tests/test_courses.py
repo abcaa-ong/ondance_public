@@ -20,7 +20,7 @@ def test_lista_courses_retorna_campos_corretos(api_client, published_course):
     primeiro = resp.json()['results'][0]
     assert set(primeiro.keys()) == {
         'id', 'title', 'description', 'duration', 'level', 'workload',
-        'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
+        'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
         'modules_count', 'lessons_count',
     }
 

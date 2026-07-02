@@ -17,6 +17,7 @@ from api.serializers import (
     EnrollmentSerializer,
     SaveProgressSerializer,
     StudyCourseSerializer,
+    TeacherDetailSerializer,
     TeacherStudentSerializer,
     CourseSerializer,
     GoogleSocialAuthSerializer,
@@ -107,13 +108,50 @@ class PublishedCourseList(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        return (
+        qs = (
             Course.objects
             .select_related('teacher__profile')
             .prefetch_related('modules')
             .filter(is_published=True)
             .order_by('title')
         )
+
+        # Filtro por estilo de dança
+        dance_style = self.request.query_params.get('dance_style')
+        if dance_style:
+            qs = qs.filter(dance_style__iexact=dance_style)
+
+        # Filtro por nível
+        level = self.request.query_params.get('level')
+        if level:
+            qs = qs.filter(level__iexact=level)
+
+        # Filtro por professor (UUID)
+        teacher_id = self.request.query_params.get('teacher')
+        if teacher_id:
+            qs = qs.filter(teacher__id=teacher_id)
+
+        # Filtro por carga horária (mínimo)
+        workload_min = self.request.query_params.get('workload_min')
+        if workload_min:
+            qs = qs.filter(workload__gte=int(workload_min))
+
+        # Filtro por carga horária (máximo)
+        workload_max = self.request.query_params.get('workload_max')
+        if workload_max:
+            qs = qs.filter(workload__lte=int(workload_max))
+
+        # Busca por título ou nome do professor
+        search = self.request.query_params.get('search', '').strip()
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(
+                Q(title__icontains=search) |
+                Q(teacher__profile__name__icontains=search) |
+                Q(teacher__email__icontains=search)
+            )
+
+        return qs
 
 
 published_courses = PublishedCourseList.as_view()
@@ -501,3 +539,19 @@ class CertificateListView(generics.ListAPIView):
 
 
 certificate_list = CertificateListView.as_view()
+
+
+class TeacherList(generics.ListAPIView):
+    serializer_class = TeacherDetailSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return (
+            User.objects
+            .filter(is_teacher=True)
+            .select_related('profile')
+            .order_by('profile__name')
+        )
+
+
+teacher_list = TeacherList.as_view()

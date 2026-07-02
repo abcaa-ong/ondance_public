@@ -55,7 +55,7 @@ def test_retorna_campos_do_curso(api_client, published_course, teacher_profile):
     curso = resp.json()['results'][0]
     assert set(curso.keys()) == {
         'id', 'title', 'description', 'duration', 'level', 'workload',
-        'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
+        'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
         'modules_count', 'lessons_count',
     }
 

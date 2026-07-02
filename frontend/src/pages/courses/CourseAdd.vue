@@ -65,12 +65,24 @@
                     :rules="[val => !!val || 'Campo obrigatório']"
                   />
                 </div>
-                <q-input
-                  v-model.number="form.workload"
-                  outlined dense
-                  type="number"
-                  label="Carga horária (horas)"
-                />
+                <div class="row q-gutter-sm">
+                  <q-select
+                    v-model="form.dance_style"
+                    outlined dense
+                    :options="danceStyleOptions"
+                    emit-value map-options
+                    clearable
+                    label="Estilo de dança"
+                    class="col"
+                  />
+                  <q-input
+                    v-model.number="form.workload"
+                    outlined dense
+                    type="number"
+                    label="Carga horária (horas)"
+                    class="col"
+                  />
+                </div>
               </div>
             </q-card-section>
           </q-card>
@@ -302,7 +314,20 @@ const form = ref({
   duration:    '',
   level:       null,
   workload:    0,
+  dance_style: null,
 })
+
+const danceStyleOptions = [
+  { label: 'Ballet', value: 'ballet' },
+  { label: 'Samba', value: 'samba' },
+  { label: 'Forró', value: 'forro' },
+  { label: 'Hip-Hop', value: 'hip_hop' },
+  { label: 'Contemporâneo', value: 'contemporaneo' },
+  { label: 'Funk', value: 'funk' },
+  { label: 'Jazz', value: 'jazz' },
+  { label: 'Dança de Salão', value: 'salão' },
+  { label: 'Outras', value: 'outras' },
+]
 
 const teacherInitials = computed(() => {
   const str = user.value?.name || user.value?.email || ''
@@ -350,6 +375,7 @@ async function saveDraft () {
       duration: form.value.duration,
       level: form.value.level,
       workload: form.value.workload || 0,
+      dance_style: form.value.dance_style || '',
       modules: modules.value.map((m, idx) => ({
         title: m.title,
         order: idx,
@@ -382,6 +408,7 @@ async function handleSubmit () {
       duration: form.value.duration,
       level: form.value.level,
       workload: form.value.workload || 0,
+      dance_style: form.value.dance_style || '',
       modules: modules.value.map((m, idx) => ({
         title: m.title,
         order: idx,

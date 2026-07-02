@@ -28,6 +28,7 @@ urlpatterns = [
     path('admin/courses/<uuid:pk>/reject/', views.admin_course_reject, name='admin-course-reject'),
     path('admin/users/', views.admin_user_list, name='admin-users'),
     path('teacher/students/', views.teacher_students, name='teacher-students'),
+    path('teachers/', views.teacher_list, name='teacher-list'),
     path('cities/', views.cities, name='cities'),
     path('states/', views.states, name='states'),
     path('auth/social/google/', views.google_social_auth, name='social_auth_google'),

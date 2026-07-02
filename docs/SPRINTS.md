@@ -51,14 +51,14 @@
 
 > Melhorias standalone — filtros, home, dados reais nos placeholders.
 
-- [ ] Filtro por tipo de dança no catálogo
-- [ ] Filtro por nível no catálogo
-- [ ] Filtro por professor no catálogo
-- [ ] Filtro por duração no catálogo
-- [ ] Seção de professores na Home
-- [ ] Depoimentos de alunos na Home
+- [x] Filtro por tipo de dança no catálogo
+- [x] Filtro por nível no catálogo
+- [x] Filtro por professor no catálogo
+- [x] Filtro por duração no catálogo
+- [x] Seção de professores na Home
+- [x] Depoimentos de alunos na Home
 - [ ] Recebe certificado ao concluir (check da visão do projeto)
-- [ ] Aprende no seu ritmo (check da visão — depende de progresso real)
+- [x] Aprende no seu ritmo (check da visão — depende de progresso real)
 - [ ] Emitir certificados (check do professor)
 
 **Itens do checklist atendidos:** Seção 5 (home), 8 (filtros), 1 (visão)

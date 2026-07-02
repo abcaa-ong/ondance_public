@@ -9,19 +9,74 @@
       </p>
     </div>
 
-    <!-- Busca -->
-    <div class="q-mb-lg">
+    <!-- Filtros -->
+    <div class="row q-gutter-md q-mb-lg" style="flex-wrap: wrap;">
+      <!-- Busca -->
       <q-input
         v-model="search"
         outlined dense
         placeholder="Buscar por título ou professor..."
-        style="max-width: 360px;"
+        style="min-width: 240px; flex: 1;"
         clearable
       >
         <template #prepend>
           <q-icon name="search" size="16px" :style="{ color: 'var(--od-text-4)' }" />
         </template>
       </q-input>
+
+      <!-- Filtro por estilo de dança -->
+      <q-select
+        v-model="filterDanceStyle"
+        :options="danceStyleOptions"
+        outlined dense
+        emit-value map-options
+        clearable
+        label="Estilo"
+        style="min-width: 160px;"
+      />
+
+      <!-- Filtro por nível -->
+      <q-select
+        v-model="filterLevel"
+        :options="levelOptions"
+        outlined dense
+        emit-value map-options
+        clearable
+        label="Nível"
+        style="min-width: 140px;"
+      />
+
+      <!-- Filtro por professor -->
+      <q-select
+        v-model="filterTeacher"
+        :options="teacherOptions"
+        outlined dense
+        emit-value map-options
+        clearable
+        label="Professor"
+        style="min-width: 180px;"
+      />
+
+      <!-- Filtro por duração (carga horária) -->
+      <q-select
+        v-model="filterWorkload"
+        :options="workloadOptions"
+        outlined dense
+        emit-value map-options
+        clearable
+        label="Duração"
+        style="min-width: 140px;"
+      />
+
+      <!-- Limpar filtros -->
+      <q-btn
+        v-if="hasActiveFilters"
+        flat no-caps
+        icon="filter_alt_off"
+        label="Limpar"
+        style="color: var(--od-text-4); height: 36px;"
+        @click="clearFilters"
+      />
     </div>
 
     <!-- Loading -->
@@ -50,7 +105,7 @@
       <p style="margin-top: 12px; color: var(--od-text-3);">
         {{ courses.length === 0 ? 'Nenhum curso publicado ainda.' : 'Nenhum curso encontrado para essa busca.' }}
       </p>
-      <q-btn v-if="search" flat no-caps label="Limpar busca" style="color: var(--od-accent);" @click="search = ''" />
+      <q-btn v-if="hasActiveFilters" flat no-caps label="Limpar filtros" style="color: var(--od-accent);" @click="clearFilters" />
     </div>
 
     <!-- Grid de cursos -->
@@ -89,6 +144,20 @@
             {{ course.title }}
           </div>
 
+          <!-- Badges -->
+          <div class="row items-center q-gutter-xs" style="margin-bottom: 10px;">
+            <q-badge
+              v-if="course.level"
+              :style="{ background: 'var(--od-accent)', color: '#fff', fontSize: '10px', borderRadius: '4px', padding: '2px 6px' }"
+              :label="course.level"
+            />
+            <q-badge
+              v-if="getDanceStyleLabel(course.dance_style)"
+              :style="{ background: 'var(--od-bg-subtle)', color: 'var(--od-text-3)', fontSize: '10px', borderRadius: '4px', padding: '2px 6px' }"
+              :label="getDanceStyleLabel(course.dance_style)"
+            />
+          </div>
+
           <!-- Rodapé -->
           <div class="row items-center justify-between">
             <q-badge
@@ -116,6 +185,7 @@
           </p>
           <div class="row q-mt-sm" style="gap: 12px; font-size: 12px; color: var(--od-text-4);">
             <span v-if="selectedCourse?.level">{{ selectedCourse.level }}</span>
+            <span v-if="selectedCourse?.dance_style">{{ getDanceStyleLabel(selectedCourse.dance_style) }}</span>
             <span v-if="selectedCourse?.duration">{{ selectedCourse.duration }}</span>
             <span v-if="selectedCourse?.workload">{{ selectedCourse.workload }}h</span>
             <span v-if="selectedCourse?.lessons_count">{{ selectedCourse.lessons_count }} aula{{ selectedCourse.lessons_count !== 1 ? 's' : '' }}</span>
@@ -145,20 +215,115 @@ const router = useRouter()
 const courses = ref([])
 const loading = ref(true)
 const error = ref(false)
-const search = ref('')
 const showEnrollDialog = ref(false)
 const selectedCourse = ref(null)
 const enrolling = ref(false)
 
-const filtered = computed(() => {
-  const q = search.value.trim().toLowerCase()
-  if (!q) return courses.value
-  return courses.value.filter(c =>
-    c.title.toLowerCase().includes(q) ||
-    (c.teacher.name || '').toLowerCase().includes(q) ||
-    c.teacher.email.toLowerCase().includes(q)
-  )
+// Filtros
+const search = ref('')
+const filterDanceStyle = ref(null)
+const filterLevel = ref(null)
+const filterTeacher = ref(null)
+const filterWorkload = ref(null)
+
+// Opções de filtro
+const danceStyleOptions = [
+  { label: 'Ballet', value: 'ballet' },
+  { label: 'Samba', value: 'samba' },
+  { label: 'Forró', value: 'forro' },
+  { label: 'Hip-Hop', value: 'hip_hop' },
+  { label: 'Contemporâneo', value: 'contemporaneo' },
+  { label: 'Funk', value: 'funk' },
+  { label: 'Jazz', value: 'jazz' },
+  { label: 'Dança de Salão', value: 'salão' },
+  { label: 'Outras', value: 'outras' },
+]
+
+const levelOptions = [
+  { label: 'Iniciante', value: 'Iniciante' },
+  { label: 'Intermediário', value: 'Intermediário' },
+  { label: 'Avançado', value: 'Avançado' },
+]
+
+const workloadOptions = [
+  { label: 'Até 10h', value: { max: 10 } },
+  { label: '10h - 20h', value: { min: 10, max: 20 } },
+  { label: '20h - 50h', value: { min: 20, max: 50 } },
+  { label: 'Mais de 50h', value: { min: 50 } },
+]
+
+const teacherOptions = computed(() => {
+  const teacherMap = new Map()
+  courses.value.forEach(c => {
+    if (c.teacher && c.teacher.id) {
+      teacherMap.set(c.teacher.id, {
+        label: c.teacher.name || c.teacher.email,
+        value: c.teacher.id,
+      })
+    }
+  })
+  return Array.from(teacherMap.values()).sort((a, b) => a.label.localeCompare(b.label))
 })
+
+const hasActiveFilters = computed(() => {
+  return search.value || filterDanceStyle.value || filterLevel.value || filterTeacher.value || filterWorkload.value
+})
+
+const filtered = computed(() => {
+  let result = courses.value
+
+  // Busca por texto
+  const q = search.value.trim().toLowerCase()
+  if (q) {
+    result = result.filter(c =>
+      c.title.toLowerCase().includes(q) ||
+      (c.teacher.name || '').toLowerCase().includes(q) ||
+      c.teacher.email.toLowerCase().includes(q)
+    )
+  }
+
+  // Filtro por estilo de dança
+  if (filterDanceStyle.value) {
+    result = result.filter(c => c.dance_style === filterDanceStyle.value)
+  }
+
+  // Filtro por nível
+  if (filterLevel.value) {
+    result = result.filter(c => c.level === filterLevel.value)
+  }
+
+  // Filtro por professor
+  if (filterTeacher.value) {
+    result = result.filter(c => c.teacher.id === filterTeacher.value)
+  }
+
+  // Filtro por duração (carga horária)
+  if (filterWorkload.value) {
+    const { min, max } = filterWorkload.value
+    result = result.filter(c => {
+      const w = c.workload || 0
+      if (min !== undefined && w < min) return false
+      if (max !== undefined && w > max) return false
+      return true
+    })
+  }
+
+  return result
+})
+
+function getDanceStyleLabel(value) {
+  if (!value) return ''
+  const option = danceStyleOptions.find(o => o.value === value)
+  return option ? option.label : value
+}
+
+function clearFilters() {
+  search.value = ''
+  filterDanceStyle.value = null
+  filterLevel.value = null
+  filterTeacher.value = null
+  filterWorkload.value = null
+}
 
 async function load () {
   loading.value = true

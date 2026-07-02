@@ -6,12 +6,25 @@ from user.models import Profile, User
 
 
 class Course(models.Model):
+    DANCE_STYLES = [
+        ('ballet', 'Ballet'),
+        ('samba', 'Samba'),
+        ('forro', 'Forró'),
+        ('hip_hop', 'Hip-Hop'),
+        ('contemporaneo', 'Contemporâneo'),
+        ('funk', 'Funk'),
+        ('jazz', 'Jazz'),
+        ('salão', 'Dança de Salão'),
+        ('outras', 'Outras'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default='')
     duration = models.CharField(max_length=50, blank=True, default='')
     level = models.CharField(max_length=20, blank=True, default='')
     workload = models.PositiveIntegerField(default=0)
+    dance_style = models.CharField(max_length=20, choices=DANCE_STYLES, blank=True, default='')
     emoji = models.CharField(max_length=10, blank=True, default='')
     thumb_bg = models.CharField(max_length=7, blank=True, default='')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)

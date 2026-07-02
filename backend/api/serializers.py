@@ -200,7 +200,7 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
+            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
             'modules_count', 'lessons_count',
         ]
         read_only_fields = ['id', 'teacher', 'is_published', 'status']
@@ -239,7 +239,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'emoji', 'thumb_bg', 'teacher', 'is_published', 'status', 'modules',
+            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status', 'modules',
         ]
         read_only_fields = ['id', 'teacher', 'is_published', 'status']
 
@@ -319,7 +319,7 @@ class PublishedCourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
+            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
             'modules_count', 'lessons_count',
         ]
         read_only_fields = ['id', 'is_published', 'status']
@@ -340,7 +340,7 @@ class AdminCourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
+            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
             'modules_count', 'lessons_count',
         ]
         read_only_fields = ['id', 'title', 'teacher', 'is_published']
