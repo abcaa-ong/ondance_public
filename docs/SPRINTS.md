@@ -14,7 +14,7 @@
 - [x] Marcar aula como concluída
 - [x] Formato das aulas: texto explicativo (campo no modelo Lesson)
 - [x] Formato das aulas: materiais extras/PDF (campo no modelo Lesson)
-- [ ] Formato das aulas: exercícios/atividades (campo no modelo Lesson)
+- [x] Formato das aulas: exercícios/atividades (campo no modelo Lesson)
 - [x] Página "Assistir aula" real (trocar placeholder)
 - [x] Assistir aulas (trocar placeholder no perfil do aluno)
 - [x] Fluxo de inscrição no catálogo (ExplorarPage → modal → AssistirPage)

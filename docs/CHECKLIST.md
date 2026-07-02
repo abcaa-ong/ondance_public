@@ -116,7 +116,7 @@
 - [x] Vídeo (player HTML5 nativo + YouTube/Vimeo embed)
 - [x] Texto explicativo (campo `content` no modelo Lesson)
 - [x] Materiais extras / PDF (campo `materials_url` no modelo Lesson)
-- [ ] Exercícios / atividades (não implementado)
+- [x] Exercícios / atividades (campo `exercises` no modelo Lesson)
 
 ## 11. Player de Aula
 

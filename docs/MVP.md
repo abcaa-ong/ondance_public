@@ -45,7 +45,7 @@
 | Seção de professores na Home | 3 | Nice-to-have |
 | Depoimentos de alunos na Home | 3 | Nice-to-have |
 | Materiais extras/PDF na aula | 1 | Vídeo já entrega valor |
-| Exercícios/atividades na aula | 1 | Nice-to-have |
+| Exercícios/atividades na aula | 1 | Implementado no Sprint 1 |
 | Compartilhar certificado | 2 | Download PDF já resolve |
 | Avaliação por estrelas + comentários | 4 | Engajamento |
 | Trilha de conhecimento | 4 | Engajamento |
