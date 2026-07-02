@@ -27,7 +27,7 @@
 - [x] Democratizar o ensino da dança (qualquer pessoa pode acessar)
 - [x] Organizar conhecimento (cursos com módulos e aulas estruturados)
 - [x] Conectar alunos e professores (perfis e catálogo)
-- [ ] Certificar aprendizado (modelo existe, mas sem API/geração/download)
+- [ ] Certificar aprendizado (API existe, sem geração/download)
 - [x] Criar base de usuários (cadastro + login + perfil)
 
 ## 3. Perfis de Usuários
@@ -142,7 +142,7 @@
 
 - [x] Modelo Certificate existe no backend
 - [ ] Geração automática ao concluir curso
-- [ ] API de certificados
+- [x] API de certificados
 
 ### Conteúdo do certificado
 
@@ -162,7 +162,7 @@
 
 - [x] Meus cursos (em andamento) — dados reais via API
 - [x] Cursos concluídos — exibidos no MyCoursesPage
-- [ ] Certificados — placeholder
+- [x] Certificados — dados reais via API
 - [x] Perfil — implementado
 
 ## 18. Área do Professor
@@ -261,7 +261,7 @@
 | Sistema de trilhas | ❌ Não implementado |
 | Área do aluno | ⚠️ Parcial (dashboard, explorar, assistir, meus cursos) |
 | Área do professor | ⚠️ Parcial (CRUD cursos + alunos) |
-| Certificados digitais | ❌ Modelo existe, sem API/geração |
+| Certificados digitais | ⚠️ API existe, sem geração/download |
 | Sistema de notificações | ❌ Só ícone UI |
 | Captação de leads | ❌ Não implementado |
 | Campanhas de comunicação | ❌ Placeholder |
