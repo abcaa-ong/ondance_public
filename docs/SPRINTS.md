@@ -121,12 +121,12 @@
 > Fecha gaps e prepara para evolução.
 
 - [ ] Proteção contra downloads ilegais de vídeos
-- [ ] Push notification (preparação infra para app futuro)
-- [ ] Professor: configurações (trocar placeholder)
-- [ ] Aluno: configurações (trocar placeholder)
-- [ ] Admin: configurações (trocar placeholder)
-- [ ] Professor: gestão de aulas (trocar placeholder)
-- [ ] Professor: ganhos/financeiro (trocar placeholder)
+- [x] Push notification (preparação infra para app futuro)
+- [x] Professor: configurações (trocar placeholder)
+- [x] Aluno: configurações (trocar placeholder)
+- [x] Admin: configurações (trocar placeholder)
+- [x] Professor: gestão de aulas (trocar placeholder)
+- [x] Professor: ganhos/financeiro (trocar placeholder)
 - [ ] Revisão geral de UX e responsividade
 - [ ] Revisão geral de acessibilidade
 - [ ] Testes end-to-end dos fluxos principais

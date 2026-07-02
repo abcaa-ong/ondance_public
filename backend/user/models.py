@@ -155,3 +155,27 @@ class Campaign(models.Model):
         verbose_name = "Campanha"
         verbose_name_plural = "Campanhas"
         ordering = ['-created_at']
+
+
+class PushDevice(models.Model):
+    PLATFORM_CHOICES = [
+        ('web', 'Web'),
+        ('android', 'Android'),
+        ('ios', 'iOS'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='push_devices')
+    token = models.CharField(max_length=500, unique=True)
+    platform = models.CharField(max_length=10, choices=PLATFORM_CHOICES, default='web')
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} — {self.platform}"
+
+    class Meta:
+        verbose_name = "Dispositivo Push"
+        verbose_name_plural = "Dispositivos Push"
+        ordering = ['-last_seen_at']

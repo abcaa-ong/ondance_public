@@ -19,6 +19,7 @@ from api.serializers import (
     EnrollmentSerializer,
     LeadSerializer,
     NotificationSerializer,
+    PushDeviceSerializer,
     ReviewSerializer,
     SaveProgressSerializer,
     StudyCourseSerializer,
@@ -34,7 +35,7 @@ from api.serializers import (
 )
 from api.throttles import RegisterThrottle, SocialAuthThrottle
 from course.models import Certificate, Comment, Course, Lesson, LessonProgress, Review, UserCourse
-from user.models import Campaign, City, Lead, Notification, Profile, State, User
+from user.models import Campaign, City, Lead, Notification, Profile, PushDevice, State, User
 
 
 class UserCreate(generics.CreateAPIView):
@@ -878,3 +879,27 @@ class PlatformConfigView(generics.GenericAPIView):
 
 
 platform_config = PlatformConfigView.as_view()
+
+
+# ── Push device registration ────────────────────────────────────────────────
+
+class PushDeviceRegisterView(generics.CreateAPIView):
+    serializer_class = PushDeviceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+push_device_register = PushDeviceRegisterView.as_view()
+
+
+class PushDeviceListView(generics.ListAPIView):
+    serializer_class = PushDeviceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return PushDevice.objects.filter(user=self.request.user, active=True)
+
+
+push_device_list = PushDeviceListView.as_view()

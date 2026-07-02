@@ -38,7 +38,7 @@ def test_get_retorna_campos_corretos(api_client, teacher, published_course):
     assert set(resp.json().keys()) == {
         'id', 'title', 'description', 'duration', 'level', 'workload',
         'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status', 'modules',
-        'prerequisite', 'prerequisite_title',
+        'prerequisite', 'prerequisite_title', 'enrollments_count',
     }
 
 

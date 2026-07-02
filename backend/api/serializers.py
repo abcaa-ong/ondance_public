@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from course.models import Certificate, Comment, Course, Lesson, LessonProgress, Module, Review, UserCourse
-from user.models import Campaign, City, Lead, Notification, Profile, State, User
+from user.models import Campaign, City, Lead, Notification, Profile, PushDevice, State, User
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -235,15 +235,20 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     teacher = TeacherDetailSerializer(read_only=True)
     modules = ModuleSerializer(many=True, required=False)
     prerequisite_title = serializers.CharField(source='prerequisite.title', read_only=True, default=None)
+    enrollments_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
             'dance_style', 'emoji', 'thumb_bg', 'prerequisite', 'prerequisite_title',
-            'teacher', 'is_published', 'status', 'modules',
+            'teacher', 'is_published', 'status', 'modules', 'enrollments_count',
         ]
         read_only_fields = ['id', 'teacher', 'is_published', 'status']
+
+    def get_enrollments_count(self, obj):
+        from course.models import UserCourse
+        return UserCourse.objects.filter(course=obj).count()
 
     def create(self, validated_data):
         modules_data = validated_data.pop('modules', [])
@@ -720,6 +725,13 @@ class CampaignSerializer(serializers.ModelSerializer):
         if data.get('type') == 'promo' and not data.get('course'):
             raise serializers.ValidationError('Campanhas de promoção devem ter um curso selecionado.')
         return data
+
+
+class PushDeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PushDevice
+        fields = ['id', 'token', 'platform', 'active', 'created_at', 'last_seen_at']
+        read_only_fields = ['id', 'created_at', 'last_seen_at']
 
 
 
