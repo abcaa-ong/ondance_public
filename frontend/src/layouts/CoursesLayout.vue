@@ -125,13 +125,7 @@ const navSections = [
       { to: '/student/my-courses', icon: 'play_circle', label: 'Meus Cursos' },
       { to: '/student/explorar', icon: 'explore', label: 'Explorar' },
       { to: '/student/certificados', icon: 'workspace_premium', label: 'Certificados' },
-    ]
-  },
-  {
-    label: 'Gestão',
-    items: [
-      { to: '/courses/students', icon: 'group', label: 'Students' },
-      { to: '/perfil',icon: 'settings', label: 'Perfil Aluno' }
+      { to: '/perfil', icon: 'settings',  label: 'Perfil' },
     ]
   }
 ]

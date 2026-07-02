@@ -30,10 +30,10 @@
               </div>
               <q-separator />
               <q-list style="padding: 4px;">
-                <q-item clickable v-close-popup to="/perfil" class="user-menu-item">
+                <!-- <q-item clickable v-close-popup to="/perfil" class="user-menu-item">
                   <q-item-section avatar style="min-width: 32px;"><q-icon name="person_outline" size="16px" /></q-item-section>
                   <q-item-section>Meu perfil</q-item-section>
-                </q-item>
+                </q-item> -->
                 <q-item clickable v-close-popup @click="handleLogout" class="user-menu-item user-menu-logout">
                   <q-item-section avatar style="min-width: 32px;"><q-icon name="logout" size="16px" /></q-item-section>
                   <q-item-section>Sair</q-item-section>
@@ -96,12 +96,6 @@ const navSections = [
       { to: '/student/my-courses', icon: 'play_circle', label: 'Meus Cursos' },
       { to: '/student/explorar', icon: 'explore', label: 'Explorar' },
       { to: '/student/certificados', icon: 'workspace_premium', label: 'Certificados' },
-    ]
-  },
-  {
-    label: 'Configurações',
-    items: [
-      { to: '/student/progresso', icon: 'bar_chart', label: 'Progresso' },
       { to: '/perfil', icon: 'settings',  label: 'Perfil' },
     ]
   }
