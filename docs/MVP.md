@@ -24,7 +24,7 @@
 
 - [x] Progresso do aluno — backend (UserCourse + LessonProgress)
 - [x] Progresso do aluno — frontend (%) e aulas assistidas/total
-- [ ] Campo carga horária no modelo Course
+- [x] Campo carga horária no modelo Course
 - [ ] API de certificados
 - [ ] Geração automática de certificado ao concluir curso
 - [ ] Download de certificado em PDF

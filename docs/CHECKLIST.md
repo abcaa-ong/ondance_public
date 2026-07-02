@@ -149,7 +149,7 @@
 - [x] Nome do aluno (via Profile)
 - [x] Nome do curso (via Course)
 - [x] Nome do professor (via Course.teacher)
-- [ ] Carga horária (campo não existe no modelo)
+- [x] Carga horária (campo `workload` no modelo Course)
 - [x] Data de conclusão (issue_date)
 - [x] Código único (code)
 

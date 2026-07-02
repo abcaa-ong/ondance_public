@@ -11,6 +11,7 @@ class Course(models.Model):
     description = models.TextField(blank=True, default='')
     duration = models.CharField(max_length=50, blank=True, default='')
     level = models.CharField(max_length=20, blank=True, default='')
+    workload = models.PositiveIntegerField(default=0)
     emoji = models.CharField(max_length=10, blank=True, default='')
     thumb_bg = models.CharField(max_length=7, blank=True, default='')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)

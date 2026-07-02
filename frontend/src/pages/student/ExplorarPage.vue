@@ -117,6 +117,7 @@
           <div class="row q-mt-sm" style="gap: 12px; font-size: 12px; color: var(--od-text-4);">
             <span v-if="selectedCourse?.level">{{ selectedCourse.level }}</span>
             <span v-if="selectedCourse?.duration">{{ selectedCourse.duration }}</span>
+            <span v-if="selectedCourse?.workload">{{ selectedCourse.workload }}h</span>
             <span v-if="selectedCourse?.lessons_count">{{ selectedCourse.lessons_count }} aula{{ selectedCourse.lessons_count !== 1 ? 's' : '' }}</span>
           </div>
         </q-card-section>

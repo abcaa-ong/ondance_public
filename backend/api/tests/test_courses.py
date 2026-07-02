@@ -19,7 +19,7 @@ def test_lista_courses_retorna_campos_corretos(api_client, published_course):
     resp = api_client.get(COURSES_URL)
     primeiro = resp.json()['results'][0]
     assert set(primeiro.keys()) == {
-        'id', 'title', 'description', 'duration', 'level',
+        'id', 'title', 'description', 'duration', 'level', 'workload',
         'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
         'modules_count', 'lessons_count',
     }
@@ -96,3 +96,33 @@ def test_post_sem_title_retorna_400(api_client, teacher):
     api_client.force_authenticate(user=teacher)
     resp = api_client.post(COURSES_URL, data={}, format='json')
     assert resp.status_code == 400
+
+
+# ── Workload (carga horária) ────────────────────────────────────────────────
+
+
+def test_cria_course_com_workload(api_client, teacher):
+    api_client.force_authenticate(user=teacher)
+    resp = api_client.post(COURSES_URL, data={'title': 'Ballet', 'workload': 40}, format='json')
+    assert resp.status_code == 201
+    assert resp.json()['workload'] == 40
+
+
+def test_workload_default_zero(api_client, teacher):
+    api_client.force_authenticate(user=teacher)
+    resp = api_client.post(COURSES_URL, data={'title': 'Jazz'}, format='json')
+    assert resp.status_code == 201
+    assert resp.json()['workload'] == 0
+
+
+def test_atualiza_workload_via_patch(api_client, teacher, published_course):
+    api_client.force_authenticate(user=teacher)
+    resp = api_client.patch(
+        f'{COURSES_URL}{published_course.id}/',
+        data={'workload': 60},
+        format='json',
+    )
+    assert resp.status_code == 200
+    assert resp.json()['workload'] == 60
+    published_course.refresh_from_db()
+    assert published_course.workload == 60

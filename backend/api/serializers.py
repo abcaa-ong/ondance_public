@@ -199,7 +199,7 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'duration', 'level',
+            'id', 'title', 'description', 'duration', 'level', 'workload',
             'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
             'modules_count', 'lessons_count',
         ]
@@ -238,7 +238,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'duration', 'level',
+            'id', 'title', 'description', 'duration', 'level', 'workload',
             'emoji', 'thumb_bg', 'teacher', 'is_published', 'status', 'modules',
         ]
         read_only_fields = ['id', 'teacher', 'is_published', 'status']
@@ -257,7 +257,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         modules_data = validated_data.pop('modules', [])
 
         for attr in [
-            'title', 'description', 'duration', 'level', 'emoji', 'thumb_bg',
+            'title', 'description', 'duration', 'level', 'workload', 'emoji', 'thumb_bg',
         ]:
             if attr in validated_data:
                 setattr(instance, attr, validated_data[attr])
@@ -318,7 +318,7 @@ class PublishedCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'duration', 'level',
+            'id', 'title', 'description', 'duration', 'level', 'workload',
             'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
             'modules_count', 'lessons_count',
         ]
@@ -339,7 +339,7 @@ class AdminCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'duration', 'level',
+            'id', 'title', 'description', 'duration', 'level', 'workload',
             'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
             'modules_count', 'lessons_count',
         ]
@@ -397,7 +397,7 @@ class StudyCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'duration', 'level',
+            'id', 'title', 'description', 'duration', 'level', 'workload',
             'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
             'modules', 'progress_percent', 'is_enrolled',
         ]

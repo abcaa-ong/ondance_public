@@ -63,22 +63,28 @@
                     label="Descrição"
                     rows="3"
                   />
-                  <div class="row q-gutter-sm">
-                    <q-input
-                      v-model="form.duration"
-                      outlined dense
-                      label="Duração (ex: 4 semanas)"
-                      class="col"
-                    />
-                    <q-select
-                      v-model="form.level"
-                      outlined dense
-                      :options="levelOptions"
-                      label="Nível *"
-                      class="col"
-                      :rules="[val => !!val || 'Campo obrigatório']"
-                    />
-                  </div>
+                <div class="row q-gutter-sm">
+                  <q-input
+                    v-model="form.duration"
+                    outlined dense
+                    label="Duração (ex: 4 semanas)"
+                    class="col"
+                  />
+                  <q-select
+                    v-model="form.level"
+                    outlined dense
+                    :options="levelOptions"
+                    label="Nível *"
+                    class="col"
+                    :rules="[val => !!val || 'Campo obrigatório']"
+                  />
+                </div>
+                <q-input
+                  v-model.number="form.workload"
+                  outlined dense
+                  type="number"
+                  label="Carga horária (horas)"
+                />
                 </div>
               </q-card-section>
             </q-card>
@@ -224,6 +230,7 @@
               <div style="font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.9;">
                 <div v-if="form.level">Nível: {{ form.level }}</div>
                 <div v-if="form.duration">{{ form.duration }}</div>
+                <div v-if="form.workload">{{ form.workload }}h de carga horária</div>
                 <div v-if="modules.length">{{ modules.length }} módulo{{ modules.length !== 1 ? 's' : '' }} · {{ totalLessons }} aula{{ totalLessons !== 1 ? 's' : '' }}</div>
               </div>
               <div class="q-mt-sm" style="font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px;">
@@ -301,6 +308,7 @@ const form = ref({
   description: '',
   duration:    '',
   level:       null,
+  workload:    0,
 })
 
 const modules = ref([])
@@ -333,6 +341,7 @@ onMounted(async () => {
     form.value.description = data.description || ''
     form.value.duration = data.duration || ''
     form.value.level = data.level || null
+    form.value.workload = data.workload ?? 0
     courseStatus.value = data.status
     modules.value = (data.modules || []).map((m) => ({
       id: m.id,
@@ -381,6 +390,7 @@ async function handleSubmit () {
       description: form.value.description,
       duration: form.value.duration,
       level: form.value.level,
+      workload: form.value.workload || 0,
       modules: modules.value.map((m, idx) => ({
         id: m.id || undefined,
         title: m.title,

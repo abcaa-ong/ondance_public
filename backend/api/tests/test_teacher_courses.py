@@ -67,7 +67,7 @@ def test_retorna_campos_corretos(api_client, teacher, published_course):
     resp = api_client.get(MINE_URL)
     curso = resp.json()['results'][0]
     assert set(curso.keys()) == {
-        'id', 'title', 'description', 'duration', 'level',
+        'id', 'title', 'description', 'duration', 'level', 'workload',
         'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
         'modules_count', 'lessons_count',
     }

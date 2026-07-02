@@ -65,6 +65,12 @@
                     :rules="[val => !!val || 'Campo obrigatório']"
                   />
                 </div>
+                <q-input
+                  v-model.number="form.workload"
+                  outlined dense
+                  type="number"
+                  label="Carga horária (horas)"
+                />
               </div>
             </q-card-section>
           </q-card>
@@ -224,6 +230,7 @@
             <div style="font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.9;">
               <div v-if="form.level">Nível: {{ form.level }}</div>
               <div v-if="form.duration">{{ form.duration }}</div>
+              <div v-if="form.workload">{{ form.workload }}h de carga horária</div>
               <div v-if="modules.length">{{ modules.length }} módulo{{ modules.length !== 1 ? 's' : '' }} · {{ totalLessons }} aula{{ totalLessons !== 1 ? 's' : '' }}</div>
             </div>
           </q-card-section>
@@ -294,6 +301,7 @@ const form = ref({
   description: '',
   duration:    '',
   level:       null,
+  workload:    0,
 })
 
 const teacherInitials = computed(() => {
@@ -341,6 +349,7 @@ async function saveDraft () {
       description: form.value.description,
       duration: form.value.duration,
       level: form.value.level,
+      workload: form.value.workload || 0,
       modules: modules.value.map((m, idx) => ({
         title: m.title,
         order: idx,
@@ -372,6 +381,7 @@ async function handleSubmit () {
       description: form.value.description,
       duration: form.value.duration,
       level: form.value.level,
+      workload: form.value.workload || 0,
       modules: modules.value.map((m, idx) => ({
         title: m.title,
         order: idx,
