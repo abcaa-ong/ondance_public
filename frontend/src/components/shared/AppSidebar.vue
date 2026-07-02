@@ -18,7 +18,7 @@
 
         <q-item
           v-for="item in section.items"
-          :key="item.to"
+          :key="item.to + item.label"
           :to="item.to"
           exact
           clickable
