@@ -50,6 +50,12 @@
           <div class="od-card q-pa-md" style="white-space: pre-wrap; color: var(--od-text-2);">{{ currentLesson.content }}</div>
         </div>
 
+        <!-- Exercises -->
+        <div v-if="currentLesson?.exercises" class="q-mt-md">
+          <div class="od-display" style="font-size: 16px; color: var(--od-text-1); margin-bottom: 8px;">Exercícios / Atividades</div>
+          <div class="od-card q-pa-md" style="white-space: pre-wrap; color: var(--od-text-2);">{{ currentLesson.exercises }}</div>
+        </div>
+
         <!-- Materials -->
         <div v-if="currentLesson?.materials_url" class="q-mt-md">
           <q-btn

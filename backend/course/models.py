@@ -48,6 +48,7 @@ class Lesson(models.Model):
     video_url = models.URLField(blank=True, default='')
     content = models.TextField(blank=True, default='')
     materials_url = models.URLField(blank=True, default='')
+    exercises = models.TextField(blank=True, default='')
     order = models.PositiveIntegerField(default=0)
 
     def __str__(self):

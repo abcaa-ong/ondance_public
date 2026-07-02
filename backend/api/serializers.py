@@ -104,7 +104,7 @@ class CitySerializer(serializers.ModelSerializer):
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'video_url', 'content', 'materials_url', 'order']
+        fields = ['id', 'title', 'video_url', 'content', 'materials_url', 'exercises', 'order']
 
 
 class LessonProgressSerializer(serializers.ModelSerializer):
@@ -120,7 +120,7 @@ class StudyLessonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'video_url', 'content', 'materials_url', 'order', 'progress']
+        fields = ['id', 'title', 'video_url', 'content', 'materials_url', 'exercises', 'order', 'progress']
 
     def get_progress(self, obj):
         progress_map = self.context.get('progress_map', {})
@@ -177,6 +177,7 @@ class ModuleSerializer(serializers.ModelSerializer):
                 lesson.video_url = lesson_data.get('video_url', lesson.video_url)
                 lesson.content = lesson_data.get('content', lesson.content)
                 lesson.materials_url = lesson_data.get('materials_url', lesson.materials_url)
+                lesson.exercises = lesson_data.get('exercises', lesson.exercises)
                 lesson.order = lesson_data.get('order', lesson.order)
                 lesson.save()
                 incoming_ids.add(str(lesson_id))
@@ -285,6 +286,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
                         lesson.video_url = lesson_data.get('video_url', lesson.video_url)
                         lesson.content = lesson_data.get('content', lesson.content)
                         lesson.materials_url = lesson_data.get('materials_url', lesson.materials_url)
+                        lesson.exercises = lesson_data.get('exercises', lesson.exercises)
                         lesson.order = lesson_data.get('order', lesson.order)
                         lesson.save()
                         lesson_incoming_ids.add(str(lesson_id))

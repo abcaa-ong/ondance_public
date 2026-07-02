@@ -153,6 +153,16 @@
                         :input-style="{ color: 'var(--od-text-3)', padding: '0' }"
                       />
                     </div>
+                    <div class="row" style="gap: 6px; margin-left: 30px; margin-top: 2px;">
+                      <q-input
+                        v-model="lesson.exercises"
+                        borderless dense
+                        placeholder="Exercícios / atividades da aula"
+                        class="col"
+                        style="font-size: 11.5px;"
+                        :input-style="{ color: 'var(--od-text-3)', padding: '0' }"
+                      />
+                    </div>
                   </div>
 
                   <!-- Botão inline de nova aula -->
@@ -317,7 +327,7 @@ function removeModule (mIdx) {
 }
 
 function addLesson (mod) {
-  mod.lessons.push({ id: nextId++, title: '', video_url: '', content: '', materials_url: '' })
+  mod.lessons.push({ id: nextId++, title: '', video_url: '', content: '', materials_url: '', exercises: '' })
 }
 
 function removeLesson (mod, lIdx) {
@@ -339,6 +349,7 @@ async function saveDraft () {
           video_url: l.video_url || '',
           content: l.content || '',
           materials_url: l.materials_url || '',
+          exercises: l.exercises || '',
           order: lidx,
         })),
       })),
@@ -369,6 +380,7 @@ async function handleSubmit () {
           video_url: l.video_url || '',
           content: l.content || '',
           materials_url: l.materials_url || '',
+          exercises: l.exercises || '',
           order: lidx,
         })),
       })),
