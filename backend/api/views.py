@@ -11,11 +11,13 @@ from allauth.socialaccount.models import SocialAccount
 from api.serializers import (
     AdminCourseSerializer,
     AdminUserSerializer,
+    CampaignSerializer,
     CertificateSerializer,
     CitySerializer,
     CommentSerializer,
     CourseDetailSerializer,
     EnrollmentSerializer,
+    LeadSerializer,
     NotificationSerializer,
     ReviewSerializer,
     SaveProgressSerializer,
@@ -32,7 +34,7 @@ from api.serializers import (
 )
 from api.throttles import RegisterThrottle, SocialAuthThrottle
 from course.models import Certificate, Comment, Course, Lesson, LessonProgress, Review, UserCourse
-from user.models import City, Notification, Profile, State, User
+from user.models import Campaign, City, Lead, Notification, Profile, State, User
 
 
 class UserCreate(generics.CreateAPIView):
@@ -706,3 +708,134 @@ class NotificationMarkRead(APIView):
 
 
 notification_mark_read = NotificationMarkRead.as_view()
+
+
+# ── Leads ───────────────────────────────────────────────────────────────────
+
+
+class LeadCreate(generics.CreateAPIView):
+    serializer_class = LeadSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+lead_create = LeadCreate.as_view()
+
+
+class LeadList(generics.ListAPIView):
+    serializer_class = LeadSerializer
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Lead.objects.all()
+
+
+lead_list = LeadList.as_view()
+
+
+# ── Campanhas ───────────────────────────────────────────────────────────────
+
+
+class CampaignListCreate(generics.ListCreateAPIView):
+    serializer_class = CampaignSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        return Campaign.objects.select_related('course', 'created_by').all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+campaign_list_create = CampaignListCreate.as_view()
+
+
+class CampaignDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CampaignSerializer
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Campaign.objects.all()
+
+
+campaign_detail = CampaignDetailView.as_view()
+
+
+class CampaignSendView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def post(self, request, pk):
+        from django.utils import timezone
+        campaign = get_object_or_404(Campaign, pk=pk)
+        if campaign.status == 'sent':
+            return Response({'message': 'Campanha já foi enviada.'}, status=status.HTTP_400_BAD_REQUEST)
+        campaign.status = 'sent'
+        campaign.sent_at = timezone.now()
+        campaign.save()
+        return Response(CampaignSerializer(campaign, context={'request': request}).data)
+
+
+campaign_send = CampaignSendView.as_view()
+
+
+# ── Analytics ───────────────────────────────────────────────────────────────
+
+
+class AnalyticsView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        from django.db.models import Avg, Count
+
+        total_users = User.objects.filter(is_active=True).count()
+        total_students = User.objects.filter(is_student=True, is_active=True).count()
+        total_teachers = User.objects.filter(is_teacher=True, is_active=True).count()
+        total_courses = Course.objects.count()
+        published_courses = Course.objects.filter(is_published=True).count()
+        total_enrollments = UserCourse.objects.count()
+        completed_enrollments = UserCourse.objects.filter(is_completed=True).count()
+        total_lessons = Lesson.objects.count()
+
+        # Cursos mais assistidos (por matrículas)
+        top_courses = (
+            Course.objects
+            .filter(is_published=True)
+            .annotate(enrollments_count=Count('usercourse'))
+            .order_by('-enrollments_count')[:5]
+            .values('title', 'enrollments_count')
+        )
+
+        # Tempo médio de aula (baseado em workload)
+        avg_workload = Course.objects.filter(is_published=True).aggregate(
+            avg=Avg('workload')
+        )['avg'] or 0
+
+        # Taxa de conclusão
+        completion_rate = (
+            (completed_enrollments / total_enrollments * 100)
+            if total_enrollments > 0 else 0
+        )
+
+        # Média de avaliação
+        avg_rating = Review.objects.aggregate(avg=Avg('rating'))['avg'] or 0
+
+        # Total de avaliações
+        total_reviews = Review.objects.count()
+
+        # Leads
+        total_leads = Lead.objects.count()
+
+        return Response({
+            'total_users': total_users,
+            'total_students': total_students,
+            'total_teachers': total_teachers,
+            'total_courses': total_courses,
+            'published_courses': published_courses,
+            'total_enrollments': total_enrollments,
+            'completed_enrollments': completed_enrollments,
+            'total_lessons': total_lessons,
+            'top_courses': list(top_courses),
+            'avg_workload_hours': round(avg_workload, 1),
+            'completion_rate': round(completion_rate, 1),
+            'avg_rating': round(avg_rating, 1),
+            'total_reviews': total_reviews,
+            'total_leads': total_leads,
+        })
+
+
+analytics_view = AnalyticsView.as_view()

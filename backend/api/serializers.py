@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from course.models import Certificate, Comment, Course, Lesson, LessonProgress, Module, Review, UserCourse
-from user.models import City, Notification, Profile, State, User
+from user.models import Campaign, City, Lead, Notification, Profile, State, User
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -689,6 +689,37 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'type', 'title', 'message', 'link', 'is_read', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+
+class LeadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lead
+        fields = ['id', 'name', 'email', 'source', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class CampaignSerializer(serializers.ModelSerializer):
+    course_title = serializers.CharField(source='course.title', read_only=True, default=None)
+    created_by_name = serializers.SerializerMethodField()
+
+    def get_created_by_name(self, obj):
+        if not obj.created_by:
+            return None
+        return getattr(getattr(obj.created_by, 'profile', None), 'name', '') or obj.created_by.email
+
+    class Meta:
+        model = Campaign
+        fields = [
+            'id', 'title', 'type', 'subject', 'body', 'course', 'course_title',
+            'status', 'sent_at', 'created_by', 'created_by_name',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'created_by', 'sent_at', 'created_at', 'updated_at']
+
+    def validate(self, data):
+        if data.get('type') == 'promo' and not data.get('course'):
+            raise serializers.ValidationError('Campanhas de promoção devem ter um curso selecionado.')
+        return data
 
 
 

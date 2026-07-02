@@ -142,6 +142,50 @@
       </div>
     </section>
 
+    <!-- ── Seção: Captação de Leads ─────────────────────────────── -->
+    <section class="lead-section" v-if="!leadSubmitted">
+      <div class="section-container lead-container">
+        <div class="lead-text">
+          <h2 class="lead-title">Receba novidades</h2>
+          <p class="lead-sub">Novos cursos, dicas e promoções direto no seu email.</p>
+        </div>
+        <q-form @submit.prevent="submitLead" class="lead-form">
+          <q-input
+            v-model="leadForm.name"
+            outlined dense
+            placeholder="Seu nome"
+            class="lead-input"
+            :rules="[val => !!val || 'Campo obrigatório']"
+          />
+          <q-input
+            v-model="leadForm.email"
+            outlined dense
+            type="email"
+            placeholder="Seu email"
+            class="lead-input"
+            :rules="[
+              val => !!val || 'Campo obrigatório',
+              val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Email inválido'
+            ]"
+          />
+          <q-btn
+            unelevated no-caps
+            label="Quero receber!"
+            type="submit"
+            :loading="leadLoading"
+            class="lead-btn"
+          />
+        </q-form>
+      </div>
+    </section>
+
+    <section class="lead-section" v-else>
+      <div class="section-container lead-container">
+        <q-icon name="check_circle" size="32px" style="color: #1D9E75;" />
+        <p style="color: var(--od-text-2); font-size: 14px;">Obrigado! Você receberá nossas novidades.</p>
+      </div>
+    </section>
+
     <!-- ── Seção 2: Stats ─────────────────────────────── -->
     <section class="stats-section">
       <div class="section-container stats-container">
@@ -363,6 +407,7 @@ import { courseService } from 'src/services/course'
 import { useQuasar } from 'quasar'
 import { useGoogleAuth } from 'src/composables/useGoogleAuth'
 import { useAuth } from 'src/composables/useAuth'
+import { api } from 'boot/axios'
 
 const $q = useQuasar()
 const router = useRouter()
@@ -421,6 +466,33 @@ const showPassword = ref(false)
 const signingUp = ref(false)
 const signupDone = ref(false)
 const confirmedEmail = ref('')
+
+// Lead capture
+const leadForm = ref({ name: '', email: '' })
+const leadLoading = ref(false)
+const leadSubmitted = ref(false)
+
+async function submitLead() {
+  leadLoading.value = true
+  try {
+    await api.post('/leads/', {
+      name: leadForm.value.name,
+      email: leadForm.value.email,
+      source: 'landing_page',
+    })
+    leadSubmitted.value = true
+    $q.notify({ type: 'positive', message: 'Obrigado! Você receberá nossas novidades.', position: 'top', timeout: 3000 })
+  } catch (e) {
+    if (e.response?.status === 400) {
+      $q.notify({ type: 'info', message: 'Este email já está na nossa lista.', position: 'top', timeout: 3000 })
+      leadSubmitted.value = true
+    } else {
+      $q.notify({ type: 'negative', message: 'Erro ao cadastrar. Tente novamente.', position: 'top', timeout: 3000 })
+    }
+  } finally {
+    leadLoading.value = false
+  }
+}
 
 function scrollToSignup() {
   const el = document.getElementById('signup-form')
@@ -801,6 +873,46 @@ function initials (str) {
   line-height: 1.8;
   margin: 0;
   width: 100%;
+}
+
+/* ── Lead capture ── */
+.lead-section {
+  padding: 32px 0;
+  background: var(--od-bg-subtle);
+  border-bottom: 1px solid var(--od-border);
+}
+.lead-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.lead-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--od-text-1);
+  margin: 0;
+}
+.lead-sub {
+  font-size: 13px;
+  color: var(--od-text-3);
+  margin: 4px 0 0;
+}
+.lead-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.lead-input {
+  width: 180px;
+}
+.lead-btn {
+  background: var(--od-accent);
+  color: #fff;
+  border-radius: 8px;
+  height: 36px;
 }
 
 /* ── Stats ── */

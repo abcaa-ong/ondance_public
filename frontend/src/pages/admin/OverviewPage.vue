@@ -7,25 +7,45 @@
     </div>
 
     <div class="row q-gutter-sm q-mb-lg">
-      <MetricCard class="col" label="Usuários ativos"    value="1.2k" change="↑ 89 este mês"   change-type="up"      accent-color="var(--od-accent)" />
-      <MetricCard class="col" label="Cursos publicados"  value="18"   change="↑ 3 esta semana"  change-type="up"      accent-color="#1D9E75" />
-      <MetricCard class="col" label="Matrículas totais"  value="4.7k" change="↑ 210 este mês"   change-type="up"      accent-color="#7F77DD" />
-      <MetricCard class="col" label="Aprovações pendentes" value="7" change="aguardando revisão" change-type="neutral" accent-color="#E97B3C" />
+      <MetricCard class="col" label="Usuários ativos"
+        :value="loading ? '…' : String(analytics.total_users || 0)"
+        :change="loading ? '' : `${analytics.total_students || 0} alunos · ${analytics.total_teachers || 0} professores`"
+        change-type="up" accent-color="var(--od-accent)" />
+      <MetricCard class="col" label="Cursos publicados"
+        :value="loading ? '…' : String(analytics.published_courses || 0)"
+        :change="loading ? '' : `${analytics.total_courses || 0} total`"
+        change-type="up" accent-color="#1D9E75" />
+      <MetricCard class="col" label="Matrículas totais"
+        :value="loading ? '…' : String(analytics.total_enrollments || 0)"
+        :change="loading ? '' : `${analytics.completion_rate || 0}% conclusão`"
+        change-type="up" accent-color="#7F77DD" />
+      <MetricCard class="col" label="Leads captados"
+        :value="loading ? '…' : String(analytics.total_leads || 0)"
+        change="cadastros na landing"
+        change-type="neutral" accent-color="#E97B3C" />
     </div>
 
     <div class="row q-gutter-md">
       <div class="col-12 col-md-6">
         <q-card flat bordered class="od-card">
           <q-card-section>
-            <div class="od-card-title od-display q-mb-md">Cursos aguardando aprovação</div>
-            <div v-for="c in pendingCourses" :key="c.id" class="row items-center q-py-sm"
-              :style="{ borderBottom: '0.5px solid var(--od-border-light)', gap: '12px' }">
-              <div class="od-course-thumb" :style="{ background: c.thumbBg }">{{ c.emoji }}</div>
-              <div style="flex:1; min-width:0;">
-                <div style="font-size: 13px; font-weight: 500; color: var(--od-text-1);">{{ c.name }}</div>
-                <div style="font-size: 11.5px; color: var(--od-text-3);">{{ c.teacher }}</div>
+            <div class="od-card-title od-display q-mb-md">Cursos mais populares</div>
+            <div v-if="loading" class="column q-gutter-xs">
+              <q-skeleton v-for="n in 3" :key="n" type="text" height="30px" />
+            </div>
+            <div v-else-if="analytics.top_courses?.length === 0" class="text-center q-py-md">
+              <p style="color: var(--od-text-4); font-size: 13px;">Nenhum dado disponível ainda.</p>
+            </div>
+            <div v-else>
+              <div v-for="(c, i) in analytics.top_courses" :key="i" class="row items-center q-py-sm"
+                :style="{ borderBottom: '0.5px solid var(--od-border-light)', gap: '12px' }">
+                <div style="width: 24px; text-align: center; font-size: 13px; font-weight: 600; color: var(--od-text-4);">{{ i + 1 }}</div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--od-text-1);">{{ c.title }}</div>
+                </div>
+                <q-badge :label="`${c.enrollments_count} matrículas`"
+                  style="background: var(--od-bg-subtle); color: var(--od-text-3); font-size: 10px;" />
               </div>
-              <q-btn dense flat no-caps label="Revisar" style="color: var(--od-accent); font-size: 11px;" to="/admin/cursos" />
             </div>
           </q-card-section>
         </q-card>
@@ -34,14 +54,31 @@
       <div class="col">
         <q-card flat bordered class="od-card">
           <q-card-section>
-            <div class="od-card-title od-display q-mb-md">Novos usuários — 7 dias</div>
-            <div class="row items-end" style="height: 80px; gap: 5px;">
-              <div v-for="(bar, i) in weekBars" :key="i" class="col"
-                style="border-radius: 3px 3px 0 0; background: var(--od-accent);"
-                :style="{ height: bar + '%', opacity: i === 5 ? 1 : 0.45 }" />
-            </div>
-            <div class="row justify-between q-mt-xs" :style="{ fontSize: '10px', color: 'var(--od-text-4)' }">
-              <span v-for="d in ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom']" :key="d">{{ d }}</span>
+            <div class="od-card-title od-display q-mb-md">Métricas gerais</div>
+            <div class="column q-gutter-md">
+              <div class="row items-center justify-between">
+                <span style="font-size: 13px; color: var(--od-text-3);">Média de carga horária</span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">{{ analytics.avg_workload_hours || 0 }}h</span>
+              </div>
+              <div class="row items-center justify-between">
+                <span style="font-size: 13px; color: var(--od-text-3);">Média de avaliação</span>
+                <div class="row items-center" style="gap: 4px;">
+                  <q-icon name="star" size="14px" style="color: #f59e0b;" />
+                  <span style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">{{ analytics.avg_rating || 0 }}</span>
+                </div>
+              </div>
+              <div class="row items-center justify-between">
+                <span style="font-size: 13px; color: var(--od-text-3);">Total de avaliações</span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">{{ analytics.total_reviews || 0 }}</span>
+              </div>
+              <div class="row items-center justify-between">
+                <span style="font-size: 13px; color: var(--od-text-3);">Total de aulas</span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">{{ analytics.total_lessons || 0 }}</span>
+              </div>
+              <div class="row items-center justify-between">
+                <span style="font-size: 13px; color: var(--od-text-3);">Cursos concluídos</span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">{{ analytics.completed_enrollments || 0 }}</span>
+              </div>
             </div>
           </q-card-section>
         </q-card>
@@ -52,12 +89,24 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { api } from 'boot/axios'
 import MetricCard from 'components/shared/MetricCard.vue'
 
-const weekBars = [35, 55, 42, 68, 50, 90, 45]
-const pendingCourses = [
-  { id: 1, name: 'Zouk Avançado',       teacher: 'Prof. Renata Souza', emoji: '🌊', thumbBg: '#EFF6FF' },
-  { id: 2, name: 'Axé Groove',          teacher: 'Prof. Marta Silva',  emoji: '🎶', thumbBg: '#FEF9EE' },
-  { id: 3, name: 'Lambada Contemporânea', teacher: 'Prof. Paulo Jr.',   emoji: '🌀', thumbBg: '#F0FDF4' },
-]
+const analytics = ref({})
+const loading = ref(true)
+
+async function loadAnalytics() {
+  loading.value = true
+  try {
+    const resp = await api.get('/admin/analytics/')
+    analytics.value = resp.data
+  } catch {
+    // silently fail
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadAnalytics)
 </script>

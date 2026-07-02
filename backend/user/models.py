@@ -103,3 +103,55 @@ class Notification(models.Model):
         verbose_name = "Notificação"
         verbose_name_plural = "Notificações"
         ordering = ['-created_at']
+
+
+class Lead(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    source = models.CharField(max_length=100, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} <{self.email}>"
+
+    class Meta:
+        verbose_name = "Lead"
+        verbose_name_plural = "Leads"
+        ordering = ['-created_at']
+
+
+class Campaign(models.Model):
+    TYPES = [
+        ('email', 'Email Marketing'),
+        ('promo', 'Promoção de Curso'),
+        ('content', 'Novo Conteúdo'),
+    ]
+    STATUS = [
+        ('draft', 'Rascunho'),
+        ('scheduled', 'Agendada'),
+        ('sent', 'Enviada'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=200)
+    type = models.CharField(max_length=20, choices=TYPES)
+    subject = models.CharField(max_length=200, blank=True, default='')
+    body = models.TextField(blank=True, default='')
+    course = models.ForeignKey(
+        'course.Course', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='campaigns', verbose_name='Curso relacionado',
+    )
+    status = models.CharField(max_length=20, choices=STATUS, default='draft')
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.get_type_display()})"
+
+    class Meta:
+        verbose_name = "Campanha"
+        verbose_name_plural = "Campanhas"
+        ordering = ['-created_at']

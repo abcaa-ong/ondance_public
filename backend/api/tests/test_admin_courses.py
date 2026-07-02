@@ -73,7 +73,7 @@ def test_retorna_campos_corretos(api_client, admin_user, pending_course, teacher
     assert set(curso.keys()) == {
         'id', 'title', 'description', 'duration', 'level', 'workload',
         'dance_style', 'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
-        'modules_count', 'lessons_count',
+        'modules_count', 'lessons_count', 'prerequisite', 'prerequisite_title',
     }
 
 
@@ -176,7 +176,7 @@ def test_aprovar_retorna_campos_corretos(api_client, admin_user, pending_course)
     assert set(resp.json().keys()) == {
         'id', 'title', 'description', 'duration', 'level', 'workload',
         'dance_style', 'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
-        'modules_count', 'lessons_count',
+        'modules_count', 'lessons_count', 'prerequisite', 'prerequisite_title',
     }
 
 
@@ -230,5 +230,5 @@ def test_rejeitar_retorna_campos_corretos(api_client, admin_user, pending_course
     assert set(resp.json().keys()) == {
         'id', 'title', 'description', 'duration', 'level', 'workload',
         'dance_style', 'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
-        'modules_count', 'lessons_count',
+        'modules_count', 'lessons_count', 'prerequisite', 'prerequisite_title',
     }

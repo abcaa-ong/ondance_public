@@ -94,22 +94,22 @@
 
 > Depende de ter usuários e dados reais fluindo.
 
-- [ ] Captação de leads (nome + email de visitantes não cadastrados)
-- [ ] Modelo + API de campanhas
-- [ ] Campanhas: email marketing
-- [ ] Campanhas: promoção de cursos
-- [ ] Campanhas: novos conteúdos
-- [ ] Admin: enviar campanhas (seção 3 do checklist)
-- [ ] Analytics real: número de usuários
-- [ ] Analytics real: cursos mais assistidos
-- [ ] Analytics real: tempo médio de aula
-- [ ] Analytics real: taxa de conclusão
-- [ ] Painel admin: estatísticas reais (trocar mock por dados da API)
+- [x] Captação de leads (nome + email de visitantes não cadastrados)
+- [x] Modelo + API de campanhas
+- [x] Campanhas: email marketing
+- [x] Campanhas: promoção de cursos
+- [x] Campanhas: novos conteúdos
+- [x] Admin: enviar campanhas (seção 3 do checklist)
+- [x] Analytics real: número de usuários
+- [x] Analytics real: cursos mais assistidos
+- [x] Analytics real: tempo médio de aula
+- [x] Analytics real: taxa de conclusão
+- [x] Painel admin: estatísticas reais (trocar mock por dados da API)
 - [ ] Analisar dados (seção 3 do checklist — admin)
 - [ ] Administrar conteúdo (seção 3 do checklist — admin)
 - [ ] Admin: categorias (trocar placeholder)
-- [ ] Admin: analytics (trocar placeholder)
-- [ ] Admin: campanhas (trocar placeholder)
+- [x] Admin: analytics (trocar placeholder)
+- [x] Admin: campanhas (trocar placeholder)
 - [ ] Admin: config (trocar placeholder)
 
 **Itens do checklist atendidos:** Seção 22, 23, 24, 25 (estatísticas), 3 (admin)
