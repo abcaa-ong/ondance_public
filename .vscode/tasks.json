@@ -68,7 +68,7 @@
             "dependsOn": [
                 "Dev: Frontend",
                 "Dev: Backend",
-                "Abrir Terminal"
+                // "Abrir Terminal"
             ],
             "problemMatcher": []
         }
