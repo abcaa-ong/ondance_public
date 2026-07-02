@@ -119,6 +119,64 @@
         </q-card>
       </div>
     </div>
+
+    <!-- Cursos em andamento -->
+    <div class="q-mt-lg">
+      <div class="od-display" style="font-size: 18px; color: var(--od-text-1); margin-bottom: 12px;">Cursos em andamento</div>
+
+      <div v-if="loadingCourses" class="row q-gutter-md">
+        <q-card v-for="n in 2" :key="n" flat bordered class="od-card" style="width: 260px;">
+          <q-card-section>
+            <q-skeleton type="rect" height="40px" style="border-radius: 8px;" class="q-mb-sm" />
+            <q-skeleton type="text" width="50%" />
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <q-card v-else-if="inProgressCourses.length === 0" flat bordered class="od-card">
+        <q-card-section class="text-center q-py-lg">
+          <q-icon name="play_circle_outline" size="36px" style="color: var(--od-text-5);" />
+          <p style="margin-top: 8px; color: var(--od-text-4); font-size: 13px;">Você não tem cursos em andamento</p>
+          <q-btn flat no-caps label="Explorar cursos" to="/student/explorar" style="color: var(--od-accent);" />
+        </q-card-section>
+      </q-card>
+
+      <div v-else class="row q-gutter-md">
+        <q-card
+          v-for="enrollment in inProgressCourses"
+          :key="enrollment.id"
+          flat bordered
+          class="od-card"
+          style="width: 260px; cursor: pointer; transition: box-shadow 0.15s;"
+          @click="$router.push(`/student/courses/${enrollment.course}/assistir`)"
+        >
+          <q-card-section style="padding: 16px;">
+            <div class="row items-center q-mb-sm" style="gap: 8px;">
+              <div
+                v-if="enrollment.course_emoji || enrollment.course_thumb_bg"
+                class="row items-center justify-center"
+                :style="{ width: '32px', height: '32px', borderRadius: '8px', background: enrollment.course_thumb_bg || 'var(--od-accent)', fontSize: '16px', flexShrink: '0' }"
+              >
+                {{ enrollment.course_emoji || '🎓' }}
+              </div>
+              <div class="od-display ellipsis" style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">
+                {{ enrollment.course_title }}
+              </div>
+            </div>
+            <div v-if="enrollment.course_level" style="font-size: 12px; color: var(--od-text-4); margin-bottom: 8px;">
+              {{ enrollment.course_level }}
+            </div>
+            <q-linear-progress
+              :value="enrollment.progress_percent / 100"
+              color="accent"
+              size="6px"
+              style="border-radius: 3px; margin-bottom: 4px;"
+            />
+            <span style="font-size: 12px; color: var(--od-text-4);">{{ enrollment.progress_percent }}% concluído</span>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -129,6 +187,7 @@ import { useRouter } from 'vue-router'
 import { profileService } from 'src/services/profile'
 import { stateService } from 'src/services/state'
 import { cityService } from 'src/services/city'
+import { courseService } from 'src/services/course'
 import { useAuth } from 'src/composables/useAuth'
 
 const $q = useQuasar()
@@ -155,6 +214,10 @@ const form = ref({
   birthday: '',
   city: null,
 })
+
+const enrollments = ref([])
+const loadingCourses = ref(true)
+const inProgressCourses = computed(() => enrollments.value.filter(e => !e.is_completed))
 
 const inputStyle = 'border-radius: 8px;'
 
@@ -193,8 +256,20 @@ async function filterCities(val, update, abort) {
 
 
 onMounted(async () => {
-  await Promise.all([loadProfile(), loadStates()])
+  await Promise.all([loadProfile(), loadStates(), loadEnrollments()])
 })
+
+async function loadEnrollments() {
+  loadingCourses.value = true
+  try {
+    const resp = await courseService.enrollments()
+    enrollments.value = resp.data.results ?? resp.data
+  } catch {
+    enrollments.value = []
+  } finally {
+    loadingCourses.value = false
+  }
+}
 
 async function loadProfile() {
   try {

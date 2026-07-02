@@ -28,7 +28,7 @@
 - [ ] API de certificados
 - [ ] Geração automática de certificado ao concluir curso
 - [ ] Download de certificado em PDF
-- [ ] Perfil: exibir cursos iniciados
+- [x] Perfil: exibir cursos iniciados
 - [ ] Perfil: exibir cursos concluídos
 - [ ] Perfil: exibir certificados
 - [ ] Área do aluno: cursos concluídos (trocar placeholder)

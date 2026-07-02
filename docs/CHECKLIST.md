@@ -89,7 +89,7 @@
 - [x] Nome
 - [x] Foto
 - [x] Cidade
-- [ ] Cursos iniciados (não exibido no perfil)
+- [x] Cursos iniciados (seção na ProfilePage)
 - [ ] Cursos concluídos (não exibido no perfil)
 - [ ] Certificados (não exibido no perfil)
 

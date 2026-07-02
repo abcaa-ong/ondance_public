@@ -412,6 +412,9 @@ class StudyCourseSerializer(serializers.ModelSerializer):
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     course_title = serializers.CharField(source='course.title', read_only=True)
+    course_emoji = serializers.CharField(source='course.emoji', read_only=True)
+    course_thumb_bg = serializers.CharField(source='course.thumb_bg', read_only=True)
+    course_level = serializers.CharField(source='course.level', read_only=True)
     progress_percent = serializers.SerializerMethodField()
 
     def get_progress_percent(self, obj):
@@ -424,8 +427,9 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserCourse
         fields = [
-            'id', 'course', 'course_title', 'started_at',
-            'completed_at', 'is_completed', 'progress_percent',
+            'id', 'course', 'course_title', 'course_emoji', 'course_thumb_bg',
+            'course_level', 'started_at', 'completed_at', 'is_completed',
+            'progress_percent',
         ]
 
 
