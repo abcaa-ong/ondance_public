@@ -153,6 +153,9 @@ STATIC_ROOT = '/home/ondance_public/backend/staticfiles'
 
 # Opcional: Adiciona compressão e cache de longo prazo (recomendado)
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },

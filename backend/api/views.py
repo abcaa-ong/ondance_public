@@ -839,3 +839,42 @@ class AnalyticsView(APIView):
 
 
 analytics_view = AnalyticsView.as_view()
+
+
+# ── Admin: Dance style stats ────────────────────────────────────────────────
+
+class DanceStyleStatsView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        from course.models import Course
+        styles = Course.DANCE_STYLES
+        stats = []
+        for value, label in styles:
+            count = Course.objects.filter(dance_style=value, is_published=True).count()
+            stats.append({'value': value, 'label': label, 'count': count})
+        total = sum(s['count'] for s in stats)
+        return Response({'styles': stats, 'total': total})
+
+
+dance_style_stats = DanceStyleStatsView.as_view()
+
+
+# ── Admin: Platform config ──────────────────────────────────────────────────
+
+class PlatformConfigView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        from django.conf import settings
+        return Response({
+            'platform_name': 'OnDance',
+            'platform_description': 'Plataforma de cursos de dança da ABCAA',
+            'default_page_size': getattr(settings, 'REST_FRAMEWORK', {}).get('PAGE_SIZE', 25),
+            'max_page_size': getattr(settings, 'REST_FRAMEWORK', {}).get('MAX_PAGE_SIZE', 100),
+            'debug': settings.DEBUG,
+            'allowed_hosts': settings.ALLOWED_HOSTS,
+        })
+
+
+platform_config = PlatformConfigView.as_view()

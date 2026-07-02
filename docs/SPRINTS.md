@@ -105,12 +105,12 @@
 - [x] Analytics real: tempo médio de aula
 - [x] Analytics real: taxa de conclusão
 - [x] Painel admin: estatísticas reais (trocar mock por dados da API)
-- [ ] Analisar dados (seção 3 do checklist — admin)
-- [ ] Administrar conteúdo (seção 3 do checklist — admin)
-- [ ] Admin: categorias (trocar placeholder)
+- [x] Analisar dados (seção 3 do checklist — admin)
+- [x] Administrar conteúdo (seção 3 do checklist — admin)
+- [x] Admin: categorias (trocar placeholder)
 - [x] Admin: analytics (trocar placeholder)
 - [x] Admin: campanhas (trocar placeholder)
-- [ ] Admin: config (trocar placeholder)
+- [x] Admin: config (trocar placeholder)
 
 **Itens do checklist atendidos:** Seção 22, 23, 24, 25 (estatísticas), 3 (admin)
 
