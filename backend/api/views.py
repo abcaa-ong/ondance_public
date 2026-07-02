@@ -13,8 +13,11 @@ from api.serializers import (
     AdminUserSerializer,
     CertificateSerializer,
     CitySerializer,
+    CommentSerializer,
     CourseDetailSerializer,
     EnrollmentSerializer,
+    NotificationSerializer,
+    ReviewSerializer,
     SaveProgressSerializer,
     StudyCourseSerializer,
     TeacherDetailSerializer,
@@ -28,8 +31,8 @@ from api.serializers import (
     UserSerializer,
 )
 from api.throttles import RegisterThrottle, SocialAuthThrottle
-from course.models import Certificate, Course, Lesson, LessonProgress, UserCourse
-from user.models import City, Profile, State, User
+from course.models import Certificate, Comment, Course, Lesson, LessonProgress, Review, UserCourse
+from user.models import City, Notification, Profile, State, User
 
 
 class UserCreate(generics.CreateAPIView):
@@ -108,11 +111,16 @@ class PublishedCourseList(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
+        from django.db.models import Avg, Count, Q
         qs = (
             Course.objects
             .select_related('teacher__profile')
             .prefetch_related('modules')
             .filter(is_published=True)
+            .annotate(
+                reviews_count=Count('reviews'),
+                reviews_avg=Avg('reviews__rating'),
+            )
             .order_by('title')
         )
 
@@ -212,6 +220,8 @@ class AdminCourseApprove(APIView):
         course.status = 'APPROVED'
         course.is_published = True
         course.save()
+        from api.notifications import notify_new_course
+        notify_new_course(course)
         return Response(AdminCourseSerializer(course, context={'request': request}).data)
 
 
@@ -495,6 +505,9 @@ class LessonProgressView(APIView):
             enrollment.is_completed = True
             enrollment.completed_at = timezone.now()
             enrollment.save()
+        else:
+            from api.notifications import notify_almost_done
+            notify_almost_done(enrollment)
 
         return Response({
             'is_completed': progress.is_completed,
@@ -555,3 +568,141 @@ class TeacherList(generics.ListAPIView):
 
 
 teacher_list = TeacherList.as_view()
+
+
+class ReviewListCreate(generics.ListCreateAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
+    def get_queryset(self):
+        qs = Review.objects.select_related('profile__user', 'course').order_by('-created_at')
+        course_id = self.request.query_params.get('course')
+        if course_id:
+            qs = qs.filter(course__id=course_id)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+review_list_create = ReviewListCreate.as_view()
+
+
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return Review.objects.filter(profile=profile)
+
+
+review_detail = ReviewDetail.as_view()
+
+
+class CourseReviewsView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        course_id = self.kwargs['pk']
+        return (
+            Review.objects
+            .select_related('profile__user', 'course')
+            .filter(course__id=course_id)
+            .order_by('-created_at')
+        )
+
+
+course_reviews = CourseReviewsView.as_view()
+
+
+class TeacherReceivedReviewsView(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Review.objects
+            .select_related('profile__user', 'course')
+            .filter(course__teacher=self.request.user)
+            .order_by('-created_at')
+        )
+
+
+teacher_reviews = TeacherReceivedReviewsView.as_view()
+
+
+class LessonCommentsView(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
+    def get_queryset(self):
+        lesson_id = self.kwargs['lesson_id']
+        return (
+            Comment.objects
+            .select_related('profile')
+            .filter(lesson__id=lesson_id, parent__isnull=True)
+            .order_by('created_at')
+        )
+
+    def perform_create(self, serializer):
+        lesson = get_object_or_404(Lesson, id=self.kwargs['lesson_id'])
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        if not UserCourse.objects.filter(profile=profile, course=lesson.module.course).exists():
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError('Você precisa estar matriculado para comentar.')
+        parent = serializer.validated_data.get('parent')
+        if parent and parent.lesson_id != lesson.id:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError('O comentário pai deve pertencer à mesma aula.')
+        serializer.save(lesson=lesson)
+
+
+lesson_comments = LessonCommentsView.as_view()
+
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return Comment.objects.filter(profile=profile)
+
+
+comment_detail = CommentDetailView.as_view()
+
+
+class NotificationList(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+
+notification_list = NotificationList.as_view()
+
+
+class NotificationMarkRead(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        ids = request.data.get('ids', [])
+        if ids:
+            Notification.objects.filter(id__in=ids, user=request.user).update(is_read=True)
+        else:
+            Notification.objects.filter(user=request.user).update(is_read=True)
+        return Response({'ok': True})
+
+
+notification_mark_read = NotificationMarkRead.as_view()

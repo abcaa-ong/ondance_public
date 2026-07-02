@@ -83,6 +83,15 @@
                     class="col"
                   />
                 </div>
+                <q-select
+                  v-model="form.prerequisite"
+                  outlined dense
+                  :options="prerequisiteOptions"
+                  emit-value map-options
+                  clearable
+                  label="Pré-requisito (curso anterior)"
+                  hint="Selecione o curso que deve ser concluído antes deste"
+                />
               </div>
             </q-card-section>
           </q-card>
@@ -295,7 +304,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuth } from 'src/composables/useAuth'
@@ -315,6 +324,7 @@ const form = ref({
   level:       null,
   workload:    0,
   dance_style: null,
+  prerequisite: null,
 })
 
 const danceStyleOptions = [
@@ -328,6 +338,13 @@ const danceStyleOptions = [
   { label: 'Dança de Salão', value: 'salão' },
   { label: 'Outras', value: 'outras' },
 ]
+
+const allCourses = ref([])
+const prerequisiteOptions = computed(() => {
+  return allCourses.value
+    .filter(c => c.id !== form.value.id)
+    .map(c => ({ label: c.title, value: c.id }))
+})
 
 const teacherInitials = computed(() => {
   const str = user.value?.name || user.value?.email || ''
@@ -409,6 +426,7 @@ async function handleSubmit () {
       level: form.value.level,
       workload: form.value.workload || 0,
       dance_style: form.value.dance_style || '',
+      prerequisite: form.value.prerequisite || null,
       modules: modules.value.map((m, idx) => ({
         title: m.title,
         order: idx,
@@ -433,4 +451,15 @@ async function handleSubmit () {
     saving.value = false
   }
 }
+
+async function loadPrerequisites() {
+  try {
+    const resp = await courseService.mine()
+    allCourses.value = resp.data.results ?? resp.data
+  } catch {
+    // silently fail
+  }
+}
+
+onMounted(loadPrerequisites)
 </script>

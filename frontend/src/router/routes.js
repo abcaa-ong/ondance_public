@@ -26,6 +26,7 @@ const teacherRoutes = {
     { path: 'courses/:id/editar',   name: 'teacher-editar',    component: () => import('pages/teacher/EditarCursoPage.vue') },
     { path: 'courses/:id/aulas',    name: 'teacher-aulas',     component: () => import('pages/teacher/AulasPage.vue') },
     { path: 'students',            name: 'teacher-students',  component: () => import('pages/teacher/StudentsPage.vue') },
+    { path: 'avaliacoes',          name: 'teacher-avaliacoes', component: () => import('pages/teacher/AvaliacoesPage.vue') },
     { path: 'ganhos',              name: 'teacher-ganhos',    component: () => import('pages/teacher/GanhosPage.vue') },
     { path: 'config',              name: 'teacher-config',    component: () => import('pages/teacher/ConfigPage.vue') },
     { path: 'perfil', name: 'teacher-perfil', component: () => import('pages/ProfilePage.vue') },

@@ -97,6 +97,15 @@
                     class="col"
                   />
                 </div>
+                <q-select
+                  v-model="form.prerequisite"
+                  outlined dense
+                  :options="prerequisiteOptions"
+                  emit-value map-options
+                  clearable
+                  label="Pré-requisito (curso anterior)"
+                  hint="Selecione o curso que deve ser concluído antes deste"
+                />
                 </div>
               </q-card-section>
             </q-card>
@@ -322,10 +331,18 @@ const form = ref({
   level:       null,
   workload:    0,
   dance_style: null,
+  prerequisite: null,
 })
 
 const modules = ref([])
 const courseStatus = ref('')
+
+const allCourses = ref([])
+const prerequisiteOptions = computed(() => {
+  return allCourses.value
+    .filter(c => c.id !== form.value.id)
+    .map(c => ({ label: c.title, value: c.id }))
+})
 
 const levelOptions = ['Iniciante', 'Intermediário', 'Avançado']
 
@@ -368,6 +385,7 @@ onMounted(async () => {
     form.value.level = data.level || null
     form.value.workload = data.workload ?? 0
     form.value.dance_style = data.dance_style || null
+    form.value.prerequisite = data.prerequisite || null
     courseStatus.value = data.status
     modules.value = (data.modules || []).map((m) => ({
       id: m.id,
@@ -389,6 +407,13 @@ onMounted(async () => {
     }
   } finally {
     loading.value = false
+  }
+  // Load available courses for prerequisite dropdown
+  try {
+    const resp = await courseService.mine()
+    allCourses.value = resp.data.results ?? resp.data
+  } catch {
+    // silently fail
   }
 })
 
@@ -418,6 +443,7 @@ async function handleSubmit () {
       level: form.value.level,
       workload: form.value.workload || 0,
       dance_style: form.value.dance_style || '',
+      prerequisite: form.value.prerequisite || null,
       modules: modules.value.map((m, idx) => ({
         id: m.id || undefined,
         title: m.title,

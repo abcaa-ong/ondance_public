@@ -69,22 +69,22 @@
 
 > Mantém o aluno voltando e cria comunidade.
 
-- [ ] Modelo + API de avaliações (estrelas 1-5)
-- [ ] Avaliação por estrelas no frontend (1-5)
-- [ ] Modelo + API de comentários
-- [ ] Comentários escritos no frontend
-- [ ] Avaliações recebidas na área do professor
-- [ ] Trilha de conhecimento — modelo de prerequisitos no Course
-- [ ] Trilha de conhecimento — frontend (sequência Iniciante → Intermediário → Avançado)
-- [ ] Sugestão "Próximo curso recomendado"
-- [ ] Modelo + API de notificações
-- [ ] Bell de notificações com dados reais (trocar badge hardcoded)
-- [ ] Notificação: nova aula disponível
-- [ ] Notificação: novo curso lançado
-- [ ] Notificação: curso quase concluído
-- [ ] Email de notificação (nova aula, novo curso, quase concluído)
-- [ ] Pop-ups in-page ("Novo curso disponível!")
-- [ ] Pop-ups in-page ("Volte e continue seu curso")
+- [x] Modelo + API de avaliações (estrelas 1-5)
+- [x] Avaliação por estrelas no frontend (1-5)
+- [x] Modelo + API de comentários
+- [x] Comentários escritos no frontend
+- [x] Avaliações recebidas na área do professor
+- [x] Trilha de conhecimento — modelo de prerequisitos no Course
+- [x] Trilha de conhecimento — frontend (sequência Iniciante → Intermediário → Avançado)
+- [x] Sugestão "Próximo curso recomendado"
+- [x] Modelo + API de notificações
+- [x] Bell de notificações com dados reais (trocar badge hardcoded)
+- [x] Notificação: nova aula disponível
+- [x] Notificação: novo curso lançado
+- [x] Notificação: curso quase concluído
+- [x] Email de notificação (nova aula, novo curso, quase concluído)
+- [x] Pop-ups in-page ("Novo curso disponível!")
+- [x] Pop-ups in-page ("Volte e continue seu curso")
 
 **Itens do checklist atendidos:** Seção 13, 18 (avaliações), 19, 20, 21
 

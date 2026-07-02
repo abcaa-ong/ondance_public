@@ -160,12 +160,22 @@
 
           <!-- Rodapé -->
           <div class="row items-center justify-between">
-            <q-badge
-              color="positive"
-              label="Publicado"
-              style="font-size: 10.5px; border-radius: 4px;"
-            />
-            <q-icon name="arrow_forward" size="16px" style="color: var(--od-text-5);" />
+            <div class="row items-center" style="gap: 4px;">
+              <q-icon v-if="course.reviews_count > 0" name="star" size="14px" style="color: #f59e0b;" />
+              <span v-if="course.reviews_count > 0" style="font-size: 12px; color: var(--od-text-3); font-weight: 500;">
+                {{ course.reviews_avg ? course.reviews_avg.toFixed(1) : '—' }}
+              </span>
+              <span v-if="course.reviews_count > 0" style="font-size: 11px; color: var(--od-text-4);">
+                ({{ course.reviews_count }})
+              </span>
+            </div>
+            <div class="row items-center" style="gap: 4px;">
+              <q-icon v-if="course.prerequisite_title" name="link" size="12px" style="color: var(--od-text-4);" />
+              <span v-if="course.prerequisite_title" style="font-size: 10px; color: var(--od-text-4); max-width: 80px;" class="ellipsis">
+                Pré: {{ course.prerequisite_title }}
+              </span>
+              <q-icon name="arrow_forward" size="16px" style="color: var(--od-text-5);" />
+            </div>
           </div>
 
         </q-card-section>
@@ -189,6 +199,24 @@
             <span v-if="selectedCourse?.duration">{{ selectedCourse.duration }}</span>
             <span v-if="selectedCourse?.workload">{{ selectedCourse.workload }}h</span>
             <span v-if="selectedCourse?.lessons_count">{{ selectedCourse.lessons_count }} aula{{ selectedCourse.lessons_count !== 1 ? 's' : '' }}</span>
+          </div>
+          <div v-if="selectedCourse?.reviews_count > 0" class="row items-center q-mt-sm" style="gap: 6px;">
+            <div class="row items-center" style="gap: 2px;">
+              <q-icon v-for="n in 5" :key="n" name="star" size="14px"
+                :style="{ color: n <= Math.round(selectedCourse.reviews_avg) ? '#f59e0b' : 'var(--od-text-5)' }" />
+            </div>
+            <span style="font-size: 13px; font-weight: 500; color: var(--od-text-2);">
+              {{ selectedCourse.reviews_avg?.toFixed(1) }}
+            </span>
+            <span style="font-size: 12px; color: var(--od-text-4);">
+              ({{ selectedCourse.reviews_count }} avaliação{{ selectedCourse.reviews_count !== 1 ? 'ões' : '' }})
+            </span>
+          </div>
+          <div v-if="selectedCourse?.prerequisite_title" class="row items-center q-mt-sm" style="gap: 6px;">
+            <q-icon name="link" size="14px" style="color: var(--od-accent);" />
+            <span style="font-size: 12px; color: var(--od-text-3);">
+              Pré-requisito: <strong style="color: var(--od-text-2);">{{ selectedCourse.prerequisite_title }}</strong>
+            </span>
           </div>
         </q-card-section>
         <q-card-actions align="right" style="padding: 8px 16px 16px;">

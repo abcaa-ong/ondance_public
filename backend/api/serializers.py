@@ -5,8 +5,8 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from course.models import Certificate, Course, Lesson, LessonProgress, Module, UserCourse
-from user.models import City, Profile, State, User
+from course.models import Certificate, Comment, Course, Lesson, LessonProgress, Module, Review, UserCourse
+from user.models import City, Notification, Profile, State, User
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -234,12 +234,14 @@ class TeacherDetailSerializer(serializers.ModelSerializer):
 class CourseDetailSerializer(serializers.ModelSerializer):
     teacher = TeacherDetailSerializer(read_only=True)
     modules = ModuleSerializer(many=True, required=False)
+    prerequisite_title = serializers.CharField(source='prerequisite.title', read_only=True, default=None)
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status', 'modules',
+            'dance_style', 'emoji', 'thumb_bg', 'prerequisite', 'prerequisite_title',
+            'teacher', 'is_published', 'status', 'modules',
         ]
         read_only_fields = ['id', 'teacher', 'is_published', 'status']
 
@@ -257,7 +259,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         modules_data = validated_data.pop('modules', [])
 
         for attr in [
-            'title', 'description', 'duration', 'level', 'workload', 'emoji', 'thumb_bg',
+            'title', 'description', 'duration', 'level', 'workload', 'emoji', 'thumb_bg', 'prerequisite',
         ]:
             if attr in validated_data:
                 setattr(instance, attr, validated_data[attr])
@@ -314,13 +316,17 @@ class PublishedCourseSerializer(serializers.ModelSerializer):
     teacher = TeacherDetailSerializer(read_only=True)
     modules_count = serializers.SerializerMethodField()
     lessons_count = serializers.SerializerMethodField()
+    reviews_count = serializers.IntegerField(read_only=True, default=0)
+    reviews_avg = serializers.FloatField(read_only=True, default=None)
+    prerequisite_title = serializers.CharField(source='prerequisite.title', read_only=True, default=None)
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'is_published', 'status',
-            'modules_count', 'lessons_count',
+            'dance_style', 'emoji', 'thumb_bg', 'prerequisite', 'prerequisite_title',
+            'teacher', 'is_published', 'status',
+            'modules_count', 'lessons_count', 'reviews_count', 'reviews_avg',
         ]
         read_only_fields = ['id', 'is_published', 'status']
 
@@ -335,12 +341,14 @@ class AdminCourseSerializer(serializers.ModelSerializer):
     teacher = TeacherDetailSerializer(read_only=True)
     modules_count = serializers.SerializerMethodField()
     lessons_count = serializers.SerializerMethodField()
+    prerequisite_title = serializers.CharField(source='prerequisite.title', read_only=True, default=None)
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'level', 'workload',
-            'dance_style', 'emoji', 'thumb_bg', 'teacher', 'status', 'is_published',
+            'dance_style', 'emoji', 'thumb_bg', 'prerequisite', 'prerequisite_title',
+            'teacher', 'status', 'is_published',
             'modules_count', 'lessons_count',
         ]
         read_only_fields = ['id', 'title', 'teacher', 'is_published']
@@ -458,6 +466,133 @@ class CertificateSerializer(serializers.ModelSerializer):
         ]
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    student_photo = serializers.SerializerMethodField()
+    course_title = serializers.CharField(source='course.title', read_only=True)
+
+    def get_student_name(self, obj):
+        return getattr(obj.profile, 'name', '') or ''
+
+    def get_student_photo(self, obj):
+        if not obj.profile.photo:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.profile.photo.url) if request else obj.profile.photo.url
+
+    class Meta:
+        model = Review
+        fields = [
+            'id', 'profile', 'course', 'course_title', 'rating', 'comment',
+            'student_name', 'student_photo', 'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'profile', 'created_at', 'updated_at']
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError('A nota deve ser entre 1 e 5.')
+        return value
+
+    def validate(self, data):
+        request = self.context.get('request')
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        course = data.get('course')
+
+        # Na atualização, não validar matrícula nem duplicidade
+        if self.instance:
+            return data
+
+        # Verificar se o aluno está matriculado no curso
+        if not UserCourse.objects.filter(profile=profile, course=course).exists():
+            raise serializers.ValidationError('Você precisa estar matriculado para avaliar este curso.')
+
+        # Verificar se já avaliou
+        if Review.objects.filter(profile=profile, course=course).exists():
+            raise serializers.ValidationError('Você já avaliou este curso.')
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        validated_data['profile'] = profile
+        return super().create(validated_data)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    student_photo = serializers.SerializerMethodField()
+    lesson_title = serializers.CharField(source='lesson.title', read_only=True)
+    replies = serializers.SerializerMethodField()
+    reply_count = serializers.SerializerMethodField()
+
+    def get_student_name(self, obj):
+        return getattr(obj.profile, 'name', '') or ''
+
+    def get_student_photo(self, obj):
+        if not obj.profile.photo:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.profile.photo.url) if request else obj.profile.photo.url
+
+    def get_replies(self, obj):
+        if obj.parent_id:
+            return []
+        replies = obj.replies.select_related('profile').order_by('created_at')[:10]
+        return CommentSerializer(replies, many=True, context=self.context).data
+
+    def get_reply_count(self, obj):
+        if obj.parent_id:
+            return 0
+        return obj.replies.count()
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'profile', 'lesson', 'lesson_title', 'parent', 'content',
+            'student_name', 'student_photo', 'replies', 'reply_count',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'profile', 'lesson', 'created_at', 'updated_at']
+
+    def validate_content(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError('O comentário não pode estar vazio.')
+        return value.strip()
+
+    def validate(self, data):
+        request = self.context.get('request')
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+
+        # Na atualização, não validar matrícula
+        if self.instance:
+            return data
+
+        lesson = data.get('lesson')
+
+        # Se lesson não veio no data (criação via URL), pular validação de matrícula
+        # A validação será feita no perform_create
+        if not lesson:
+            return data
+
+        # Verificar se o aluno está matriculado no curso da aula
+        if not UserCourse.objects.filter(profile=profile, course=lesson.module.course).exists():
+            raise serializers.ValidationError('Você precisa estar matriculado para comentar.')
+
+        # Verificar se o parent pertence à mesma aula
+        parent = data.get('parent')
+        if parent and parent.lesson_id != lesson.id:
+            raise serializers.ValidationError('O comentário pai deve pertencer à mesma aula.')
+
+        return data
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        validated_data['profile'] = profile
+        return super().create(validated_data)
+
+
 class AdminUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     role = serializers.SerializerMethodField()
@@ -547,6 +682,13 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
             )
 
         return id_info
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'type', 'title', 'message', 'link', 'is_read', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 
 

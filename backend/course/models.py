@@ -27,6 +27,10 @@ class Course(models.Model):
     dance_style = models.CharField(max_length=20, choices=DANCE_STYLES, blank=True, default='')
     emoji = models.CharField(max_length=10, blank=True, default='')
     thumb_bg = models.CharField(max_length=7, blank=True, default='')
+    prerequisite = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='subsequent_courses', verbose_name='Pré-requisito',
+    )
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
     status = models.CharField(max_length=20, default='PENDING')
@@ -126,3 +130,42 @@ class Certificate(models.Model):
     class Meta:
         verbose_name = "Certificado"
         verbose_name_plural = "Certificados"
+
+
+class Review(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='reviews')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.profile.name} — {self.course.title} ({self.rating}★)"
+
+    class Meta:
+        verbose_name = "Avaliação"
+        verbose_name_plural = "Avaliações"
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(fields=['profile', 'course'], name='unique_review_per_user_course'),
+        ]
+
+
+class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='comments')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.profile.name} em {self.lesson.title}"
+
+    class Meta:
+        verbose_name = "Comentário"
+        verbose_name_plural = "Comentários"
+        ordering = ['created_at']

@@ -16,10 +16,13 @@ def custom_exception_handler(exc, context):
     if isinstance(exc, ValidationError):
         message = _first_message(response.data)
     else:
-        detail = response.data.get('detail', '')
+        detail = response.data.get('detail', '') if isinstance(response.data, dict) else ''
         message = _AUTH_MESSAGES.get(str(detail), str(detail)) or str(exc)
 
-    response.data['message'] = message
+    if isinstance(response.data, dict):
+        response.data['message'] = message
+    else:
+        response.data = {'detail': response.data, 'message': message}
     return response
 
 

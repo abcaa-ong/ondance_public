@@ -75,3 +75,31 @@ class City(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.state.abbreviation}"
+
+
+class Notification(models.Model):
+    TYPES = [
+        ('new_lesson', 'Nova aula disponível'),
+        ('new_course', 'Novo curso lançado'),
+        ('almost_done', 'Curso quase concluído'),
+        ('review', 'Nova avaliação'),
+        ('comment', 'Novo comentário'),
+        ('system', 'Sistema'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length=20, choices=TYPES)
+    title = models.CharField(max_length=200)
+    message = models.TextField(blank=True, default='')
+    link = models.CharField(max_length=500, blank=True, default='')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.type}: {self.title}"
+
+    class Meta:
+        verbose_name = "Notificação"
+        verbose_name_plural = "Notificações"
+        ordering = ['-created_at']

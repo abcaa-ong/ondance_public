@@ -65,6 +65,130 @@
           />
         </div>
 
+        <!-- Comments section -->
+        <div v-if="currentLesson" class="q-mt-lg">
+          <div class="row items-center q-mb-md" style="gap: 8px;">
+            <q-icon name="forum" size="20px" style="color: var(--od-text-3);" />
+            <span style="font-size: 15px; font-weight: 600; color: var(--od-text-1);">
+              Comentários
+            </span>
+            <span v-if="comments.length" style="font-size: 12px; color: var(--od-text-4);">({{ comments.length }})</span>
+          </div>
+
+          <!-- Comment input -->
+          <div class="od-comment-input q-mb-md">
+            <q-input
+              v-model="newComment"
+              outlined dense
+              type="textarea"
+              placeholder="Deixe um comentário sobre esta aula..."
+              rows="2"
+              style="font-size: 13px;"
+            />
+            <div class="row justify-end q-mt-xs">
+              <q-btn
+                unelevated no-caps
+                label="Comentar"
+                icon="send"
+                :disable="!newComment.trim()"
+                :loading="submittingComment"
+                @click="submitComment"
+                size="sm"
+                style="background: var(--od-accent); color: #fff; border-radius: 6px;"
+              />
+            </div>
+          </div>
+
+          <!-- Comments list -->
+          <div v-if="commentsLoading" class="q-py-md">
+            <q-skeleton v-for="n in 3" :key="n" type="rect" height="60px" class="q-mb-sm" style="border-radius: 8px;" />
+          </div>
+
+          <div v-else-if="comments.length === 0" class="text-center q-py-md">
+            <p style="font-size: 13px; color: var(--od-text-4);">Nenhum comentário ainda. Seja o primeiro!</p>
+          </div>
+
+          <div v-else class="od-comments-list">
+            <div v-for="comment in comments" :key="comment.id" class="od-comment-item">
+              <div class="row items-start" style="gap: 10px;">
+                <q-avatar size="32px" style="flex-shrink: 0;">
+                  <img v-if="comment.student_photo" :src="comment.student_photo" />
+                  <div
+                    v-else
+                    class="row items-center justify-center full-width full-height"
+                    style="background: var(--od-accent); color: #fff; font-size: 12px; font-weight: 600; border-radius: 50%;"
+                  >{{ initials(comment.student_name) }}</div>
+                </q-avatar>
+                <div style="flex: 1; min-width: 0;">
+                  <div class="row items-center" style="gap: 6px;">
+                    <span style="font-size: 13px; font-weight: 600; color: var(--od-text-1);">{{ comment.student_name }}</span>
+                    <span style="font-size: 11px; color: var(--od-text-5);">{{ formatTime(comment.created_at) }}</span>
+                  </div>
+                  <p style="margin: 4px 0 0; font-size: 13px; color: var(--od-text-2); white-space: pre-wrap;">{{ comment.content }}</p>
+
+                  <!-- Replies -->
+                  <div v-if="comment.replies?.length" class="od-replies q-mt-sm">
+                    <div v-for="reply in comment.replies" :key="reply.id" class="od-comment-item od-comment-item--reply">
+                      <div class="row items-start" style="gap: 8px;">
+                        <q-avatar size="24px" style="flex-shrink: 0;">
+                          <img v-if="reply.student_photo" :src="reply.student_photo" />
+                          <div
+                            v-else
+                            class="row items-center justify-center full-width full-height"
+                            style="background: var(--od-accent); color: #fff; font-size: 9px; font-weight: 600; border-radius: 50%;"
+                          >{{ initials(reply.student_name) }}</div>
+                        </q-avatar>
+                        <div style="flex: 1; min-width: 0;">
+                          <div class="row items-center" style="gap: 6px;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--od-text-1);">{{ reply.student_name }}</span>
+                            <span style="font-size: 11px; color: var(--od-text-5);">{{ formatTime(reply.created_at) }}</span>
+                          </div>
+                          <p style="margin: 2px 0 0; font-size: 12px; color: var(--od-text-2); white-space: pre-wrap;">{{ reply.content }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Reply button -->
+                  <q-btn
+                    v-if="!comment.replying"
+                    flat no-caps dense
+                    label="Responder"
+                    size="xs"
+                    style="color: var(--od-text-4); margin-top: 4px;"
+                    @click="comment.replying = true"
+                  />
+
+                  <!-- Reply input -->
+                  <div v-if="comment.replying" class="q-mt-sm">
+                    <q-input
+                      v-model="comment.replyText"
+                      outlined dense
+                      placeholder="Sua resposta..."
+                      rows="1"
+                      style="font-size: 12px;"
+                    />
+                    <div class="row q-mt-xs" style="gap: 4px;">
+                      <q-btn
+                        unelevated no-caps label="Enviar" size="xs"
+                        :disable="!comment.replyText?.trim()"
+                        :loading="comment.submittingReply"
+                        @click="submitReply(comment)"
+                        style="background: var(--od-accent); color: #fff; border-radius: 4px;"
+                      />
+                      <q-btn
+                        flat no-caps label="Cancelar" size="xs"
+                        style="color: var(--od-text-4);"
+                        @click="comment.replying = false; comment.replyText = ''"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Mark complete button -->
         <div class="q-mt-md" v-if="currentLesson && !currentLesson.progress?.is_completed">
           <q-btn
@@ -90,6 +214,94 @@
             @click="goToLesson(nextLesson)"
             style="background: var(--od-accent); color: #fff; border-radius: 8px;"
           />
+        </div>
+
+        <!-- Review section (only when course completed) -->
+        <div v-if="course.progress_percent === 100" class="od-review-section q-mt-lg">
+          <div class="od-review-divider" />
+
+          <div v-if="reviewLoading" class="q-py-md">
+            <q-skeleton type="rect" height="80px" style="border-radius: 8px;" />
+          </div>
+
+          <!-- Already reviewed -->
+          <div v-else-if="existingReview" class="od-review-card">
+            <div class="row items-center q-mb-sm" style="gap: 8px;">
+              <q-icon name="rate_review" size="20px" style="color: var(--od-accent);" />
+              <span style="font-size: 15px; font-weight: 600; color: var(--od-text-1);">Sua avaliação</span>
+            </div>
+            <StarRating :model-value="existingReview.rating" readonly size="md" :show-label="true" />
+            <p v-if="existingReview.comment" style="margin-top: 8px; font-size: 13px; color: var(--od-text-2);">{{ existingReview.comment }}</p>
+          </div>
+
+          <!-- Review form -->
+          <div v-else-if="showReviewForm" class="od-review-card">
+            <div class="row items-center q-mb-sm" style="gap: 8px;">
+              <q-icon name="rate_review" size="20px" style="color: var(--od-accent);" />
+              <span style="font-size: 15px; font-weight: 600; color: var(--od-text-1);">Avalie este curso</span>
+            </div>
+            <p style="font-size: 13px; color: var(--od-text-3); margin-bottom: 10px;">
+              Como foi sua experiência? Sua avaliação ajuda outros alunos.
+            </p>
+            <StarRating v-model="reviewRating" size="lg" />
+            <q-input
+              v-model="reviewComment"
+              outlined dense
+              type="textarea"
+              placeholder="Deixe um comentário (opcional)"
+              rows="3"
+              class="q-mt-md"
+              style="font-size: 13px;"
+            />
+            <div class="row q-mt-md" style="gap: 8px;">
+              <q-btn
+                unelevated no-caps
+                label="Enviar avaliação"
+                icon="send"
+                :disable="reviewRating === 0"
+                :loading="submittingReview"
+                @click="submitReview"
+                style="background: var(--od-accent); color: #fff; border-radius: 8px;"
+              />
+              <q-btn
+                flat no-caps
+                label="Agora não"
+                @click="showReviewForm = false"
+                style="color: var(--od-text-4);"
+              />
+            </div>
+          </div>
+
+          <!-- Prompt to review -->
+          <div v-else class="od-review-prompt" @click="showReviewForm = true">
+            <q-icon name="star_outline" size="24px" style="color: var(--od-accent);" />
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">Avalie este curso</div>
+              <div style="font-size: 12px; color: var(--od-text-4);">Compartilhe sua experiência com outros alunos</div>
+            </div>
+            <q-icon name="chevron_right" size="20px" style="color: var(--od-text-5); margin-left: auto;" />
+          </div>
+        </div>
+
+        <!-- Next course recommendation -->
+        <div v-if="course.progress_percent === 100 && nextCourse" class="od-next-course q-mt-lg">
+          <div class="od-review-divider" />
+          <div class="od-next-course-card">
+            <q-icon name="trending_up" size="24px" style="color: var(--od-accent);" />
+            <div style="flex: 1;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">Próximo curso recomendado</div>
+              <div style="font-size: 13px; color: var(--od-text-2); margin-top: 2px;">{{ nextCourse.title }}</div>
+              <div v-if="nextCourse.level" style="font-size: 11px; color: var(--od-text-4); margin-top: 2px;">{{ nextCourse.level }} · {{ nextCourse.dance_style || 'Dança' }}</div>
+            </div>
+            <q-btn
+              unelevated no-caps
+              label="Ver curso"
+              icon="arrow_forward"
+              :to="`/student/explorar`"
+              size="sm"
+              style="background: var(--od-accent); color: #fff; border-radius: 6px;"
+            />
+          </div>
         </div>
       </div>
 
@@ -125,10 +337,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { courseService } from 'src/services/course'
+import { reviewService, commentService } from 'src/services/review'
 import VideoPlayer from 'components/shared/VideoPlayer.vue'
+import StarRating from 'components/shared/StarRating.vue'
 
 const route = useRoute()
 const courseId = computed(() => route.params.id)
@@ -140,6 +354,23 @@ const errorMessage = ref('')
 const currentLessonId = ref(null)
 const markingComplete = ref(false)
 let pendingSave = null
+
+// Review
+const existingReview = ref(null)
+const reviewLoading = ref(false)
+const showReviewForm = ref(false)
+const reviewRating = ref(0)
+const reviewComment = ref('')
+const submittingReview = ref(false)
+
+// Comments
+const comments = ref([])
+const commentsLoading = ref(false)
+const newComment = ref('')
+const submittingComment = ref(false)
+
+// Next course recommendation
+const nextCourse = ref(null)
 
 const allLessons = computed(() => {
   const lessons = []
@@ -178,6 +409,7 @@ async function loadCourse() {
     if (!course.value.modules) course.value.modules = []
     const firstIncomplete = allLessons.value.find(l => !l.progress?.is_completed)
     currentLessonId.value = (firstIncomplete || allLessons.value[0] || {}).id || null
+    if (course.value.progress_percent === 100) loadReview()
   } catch (e) {
     error.value = true
     const status = e.response?.status
@@ -227,6 +459,13 @@ async function markComplete() {
       if (!currentLesson.value.progress) currentLesson.value.progress = {}
       currentLesson.value.progress.is_completed = true
     }
+    // Check if course is now completed
+    const totalLessons = allLessons.value.length
+    const completedLessons = allLessons.value.filter(l => l.progress?.is_completed).length
+    if (totalLessons > 0 && completedLessons === totalLessons) {
+      course.value.progress_percent = 100
+      loadReview()
+    }
   } catch {
     // silently fail
   } finally {
@@ -248,8 +487,133 @@ async function flushSave() {
   }
 }
 
+async function loadReview() {
+  reviewLoading.value = true
+  try {
+    const resp = await reviewService.byCourse(courseId.value)
+    const reviews = resp.data.results ?? resp.data
+    existingReview.value = reviews.length > 0 ? reviews[0] : null
+  } catch {
+    // silently fail
+  } finally {
+    reviewLoading.value = false
+  }
+  // Load next course recommendation
+  loadNextCourse()
+}
+
+async function loadNextCourse() {
+  try {
+    const resp = await courseService.published()
+    const courses = resp.data.results ?? resp.data
+    // Find courses that have this course as prerequisite
+    const next = courses.find(c => c.prerequisite === courseId.value)
+    nextCourse.value = next || null
+  } catch {
+    nextCourse.value = null
+  }
+}
+
+async function submitReview() {
+  if (!reviewRating.value) return
+  submittingReview.value = true
+  try {
+    const resp = await reviewService.create({
+      course: courseId.value,
+      rating: reviewRating.value,
+      comment: reviewComment.value || '',
+    })
+    existingReview.value = resp.data
+    showReviewForm.value = false
+    reviewRating.value = 0
+    reviewComment.value = ''
+  } catch {
+    // silently fail
+  } finally {
+    submittingReview.value = false
+  }
+}
+
+// Comments
+async function loadComments() {
+  if (!currentLessonId.value) return
+  commentsLoading.value = true
+  try {
+    const resp = await commentService.listByLesson(currentLessonId.value)
+    comments.value = (resp.data.results ?? resp.data).map(c => ({
+      ...c,
+      replying: false,
+      replyText: '',
+      submittingReply: false,
+    }))
+  } catch {
+    comments.value = []
+  } finally {
+    commentsLoading.value = false
+  }
+}
+
+async function submitComment() {
+  if (!newComment.value.trim()) return
+  submittingComment.value = true
+  try {
+    const resp = await commentService.create(currentLessonId.value, {
+      content: newComment.value.trim(),
+    })
+    comments.value.push({
+      ...resp.data,
+      replying: false,
+      replyText: '',
+      submittingReply: false,
+    })
+    newComment.value = ''
+  } catch {
+    // silently fail
+  } finally {
+    submittingComment.value = false
+  }
+}
+
+async function submitReply(comment) {
+  if (!comment.replyText?.trim()) return
+  comment.submittingReply = true
+  try {
+    const resp = await commentService.create(currentLessonId.value, {
+      content: comment.replyText.trim(),
+      parent: comment.id,
+    })
+    if (!comment.replies) comment.replies = []
+    comment.replies.push(resp.data)
+    comment.replying = false
+    comment.replyText = ''
+  } catch {
+    // silently fail
+  } finally {
+    comment.submittingReply = false
+  }
+}
+
+function formatTime(dateStr) {
+  const d = new Date(dateStr)
+  const now = new Date()
+  const diff = now - d
+  if (diff < 60000) return 'agora'
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}min`
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h`
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+}
+
+function initials(str) {
+  if (!str) return '?'
+  return str.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+}
+
 onMounted(loadCourse)
 onBeforeUnmount(flushSave)
+
+watch(currentLessonId, () => {
+  if (currentLessonId.value) loadComments()
+})
 </script>
 
 <style scoped>
@@ -291,6 +655,77 @@ onBeforeUnmount(flushSave)
 }
 .od-sidebar-lesson--done {
   color: var(--od-text-4);
+}
+
+/* Review section */
+.od-review-section {
+  margin-top: 24px;
+}
+.od-review-divider {
+  height: 1px;
+  background: var(--od-border);
+  margin-bottom: 20px;
+}
+.od-review-card {
+  padding: 20px;
+  background: var(--od-bg-surface);
+  border: 1px solid var(--od-border);
+  border-radius: 12px;
+}
+.od-review-prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--od-bg-surface);
+  border: 1px dashed var(--od-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.od-review-prompt:hover {
+  border-color: var(--od-accent);
+  background: var(--od-bg-hover);
+}
+
+/* Comments */
+.od-comment-input {
+  padding: 12px;
+  background: var(--od-bg-surface);
+  border: 1px solid var(--od-border);
+  border-radius: 8px;
+}
+.od-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.od-comment-item {
+  padding: 12px;
+  background: var(--od-bg-surface);
+  border: 1px solid var(--od-border);
+  border-radius: 8px;
+}
+.od-comment-item--reply {
+  background: transparent;
+  border: none;
+  padding: 8px 0 0 0;
+}
+.od-replies {
+  padding-left: 12px;
+  border-left: 2px solid var(--od-border);
+}
+
+/* Next course */
+.od-next-course-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--od-bg-surface);
+  border: 1px solid var(--od-border);
+  border-radius: 12px;
+  border-left: 3px solid var(--od-accent);
 }
 
 @media (max-width: 900px) {
