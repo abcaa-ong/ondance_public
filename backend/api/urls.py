@@ -22,6 +22,7 @@ urlpatterns = [
     path('courses/<uuid:pk>/study/', views.course_study, name='course-study'),
     path('courses/<uuid:course_id>/lessons/<uuid:lesson_id>/progress/', views.lesson_progress, name='lesson-progress'),
     path('enrollments/', views.student_enrollments, name='student-enrollments'),
+    path('certificates/', views.certificate_list, name='certificate-list'),
     path('admin/courses/', views.admin_course_list, name='admin-courses'),
     path('admin/courses/<uuid:pk>/approve/', views.admin_course_approve, name='admin-course-approve'),
     path('admin/courses/<uuid:pk>/reject/', views.admin_course_reject, name='admin-course-reject'),

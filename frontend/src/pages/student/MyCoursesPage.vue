@@ -5,6 +5,21 @@
       <p style="color: var(--od-text-3); margin: 4px 0 0; font-size: 14px;">Cursos em que você está matriculado</p>
     </div>
 
+    <!-- Tabs -->
+    <q-tabs
+      v-model="activeTab"
+      dense
+      no-caps
+      inline-label
+      class="q-mb-md"
+      active-color="var(--od-accent)"
+      indicator-color="var(--od-accent)"
+      style="color: var(--od-text-4);"
+    >
+      <q-tab name="progress" icon="play_circle" label="Em andamento" />
+      <q-tab name="completed" icon="check_circle" label="Concluídos" />
+    </q-tabs>
+
     <!-- Loading -->
     <div v-if="loading" class="row q-gutter-md">
       <q-card v-for="n in 3" :key="n" flat bordered class="od-card" style="width: 280px;">
@@ -26,11 +41,13 @@
     </q-card>
 
     <!-- Empty -->
-    <q-card v-else-if="enrollments.length === 0" flat bordered class="od-card">
+    <q-card v-else-if="filteredEnrollments.length === 0" flat bordered class="od-card">
       <q-card-section class="text-center q-py-xl">
-        <q-icon name="play_circle" size="48px" style="color: var(--od-text-5);" />
-        <p style="margin-top: 12px; color: var(--od-text-3);">Suas matrículas aparecerão aqui</p>
-        <q-btn unelevated no-caps label="Explorar cursos" to="/student/explorar"
+        <q-icon :name="activeTab === 'progress' ? 'play_circle' : 'check_circle'" size="48px" style="color: var(--od-text-5);" />
+        <p style="margin-top: 12px; color: var(--od-text-3);">
+          {{ activeTab === 'progress' ? 'Você não tem cursos em andamento' : 'Você ainda não concluiu nenhum curso' }}
+        </p>
+        <q-btn v-if="activeTab === 'progress'" unelevated no-caps label="Explorar cursos" to="/student/explorar"
           style="background: var(--od-accent); color: #fff; border-radius: 8px; margin-top: 8px;" />
       </q-card-section>
     </q-card>
@@ -38,7 +55,7 @@
     <!-- Course list -->
     <div v-else class="row q-gutter-md">
       <q-card
-        v-for="enrollment in enrollments"
+        v-for="enrollment in filteredEnrollments"
         :key="enrollment.id"
         flat bordered
         class="od-card od-course-card"
@@ -50,7 +67,7 @@
             {{ enrollment.course_title }}
           </div>
           <div class="q-mb-sm" style="font-size: 13px; color: var(--od-text-3);">
-            {{ formatDate(enrollment.started_at) }}
+            {{ formatDate(activeTab === 'progress' ? enrollment.started_at : enrollment.completed_at) }}
           </div>
           <q-linear-progress
             :value="enrollment.progress_percent / 100"
@@ -74,7 +91,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { courseService } from 'src/services/course'
 
@@ -82,6 +99,13 @@ const router = useRouter()
 const enrollments = ref([])
 const loading = ref(true)
 const error = ref(false)
+const activeTab = ref('progress')
+
+const filteredEnrollments = computed(() =>
+  activeTab.value === 'progress'
+    ? enrollments.value.filter(e => !e.is_completed)
+    : enrollments.value.filter(e => e.is_completed)
+)
 
 async function load() {
   loading.value = true

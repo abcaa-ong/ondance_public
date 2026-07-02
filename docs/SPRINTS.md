@@ -31,15 +31,15 @@
 - [x] Progresso do aluno — backend (UserCourse + LessonProgress)
 - [x] Progresso do aluno — frontend (%) e aulas assistidas/total
 - [x] Campo carga horária no modelo Course
-- [ ] API de certificados
+- [x] API de certificados
 - [ ] Geração automática de certificado ao concluir curso
 - [ ] Download de certificado em PDF
 - [ ] Compartilhar certificado
 - [x] Perfil: exibir cursos iniciados
-- [ ] Perfil: exibir cursos concluídos
-- [ ] Perfil: exibir certificados
-- [ ] Área do aluno: cursos concluídos (trocar placeholder)
-- [ ] Área do aluno: certificados (trocar placeholder)
+- [x] Perfil: exibir cursos concluídos
+- [x] Perfil: exibir certificados
+- [x] Área do aluno: cursos concluídos (trocar placeholder)
+- [x] Área do aluno: certificados (trocar placeholder)
 - [ ] Certificados no perfil do aluno (seção 7 do checklist)
 - [ ] Recuperação de senha por email
 

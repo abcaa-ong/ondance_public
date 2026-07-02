@@ -90,8 +90,8 @@
 - [x] Foto
 - [x] Cidade
 - [x] Cursos iniciados (seção na ProfilePage)
-- [ ] Cursos concluídos (não exibido no perfil)
-- [ ] Certificados (não exibido no perfil)
+- [x] Cursos concluídos (seção na ProfilePage)
+- [x] Certificados (seção na ProfilePage + página dedicada)
 
 ## 8. Catálogo de Cursos
 

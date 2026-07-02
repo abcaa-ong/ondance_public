@@ -177,6 +177,104 @@
         </q-card>
       </div>
     </div>
+
+    <!-- Cursos concluídos -->
+    <div class="q-mt-lg">
+      <div class="od-display" style="font-size: 18px; color: var(--od-text-1); margin-bottom: 12px;">Cursos concluídos</div>
+
+      <div v-if="loadingCourses" class="row q-gutter-md">
+        <q-card v-for="n in 2" :key="n" flat bordered class="od-card" style="width: 260px;">
+          <q-card-section>
+            <q-skeleton type="rect" height="40px" style="border-radius: 8px;" class="q-mb-sm" />
+            <q-skeleton type="text" width="50%" />
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <q-card v-else-if="completedCourses.length === 0" flat bordered class="od-card">
+        <q-card-section class="text-center q-py-lg">
+          <q-icon name="check_circle_outline" size="36px" style="color: var(--od-text-5);" />
+          <p style="margin-top: 8px; color: var(--od-text-4); font-size: 13px;">Você ainda não concluiu nenhum curso</p>
+        </q-card-section>
+      </q-card>
+
+      <div v-else class="row q-gutter-md">
+        <q-card
+          v-for="enrollment in completedCourses"
+          :key="enrollment.id"
+          flat bordered
+          class="od-card"
+          style="width: 260px; cursor: pointer; transition: box-shadow 0.15s;"
+          @click="$router.push(`/student/courses/${enrollment.course}/assistir`)"
+        >
+          <q-card-section style="padding: 16px;">
+            <div class="row items-center q-mb-sm" style="gap: 8px;">
+              <div
+                v-if="enrollment.course_emoji || enrollment.course_thumb_bg"
+                class="row items-center justify-center"
+                :style="{ width: '32px', height: '32px', borderRadius: '8px', background: enrollment.course_thumb_bg || 'var(--od-accent)', fontSize: '16px', flexShrink: '0' }"
+              >
+                {{ enrollment.course_emoji || '🎓' }}
+              </div>
+              <div class="od-display ellipsis" style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">
+                {{ enrollment.course_title }}
+              </div>
+            </div>
+            <div v-if="enrollment.course_level" style="font-size: 12px; color: var(--od-text-4); margin-bottom: 8px;">
+              {{ enrollment.course_level }}
+            </div>
+            <q-badge color="positive" label="Concluído" style="font-size: 10px;" />
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+
+    <!-- Certificados -->
+    <div class="q-mt-lg">
+      <div class="od-display" style="font-size: 18px; color: var(--od-text-1); margin-bottom: 12px;">Certificados</div>
+
+      <div v-if="loadingCertificates" class="row q-gutter-md">
+        <q-card v-for="n in 2" :key="n" flat bordered class="od-card" style="width: 260px;">
+          <q-card-section>
+            <q-skeleton type="rect" height="40px" style="border-radius: 8px;" class="q-mb-sm" />
+            <q-skeleton type="text" width="50%" />
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <q-card v-else-if="certificates.length === 0" flat bordered class="od-card">
+        <q-card-section class="text-center q-py-lg">
+          <q-icon name="workspace_premium" size="36px" style="color: var(--od-text-5);" />
+          <p style="margin-top: 8px; color: var(--od-text-4); font-size: 13px;">Você ainda não possui certificados</p>
+        </q-card-section>
+      </q-card>
+
+      <div v-else class="row q-gutter-md">
+        <q-card
+          v-for="cert in certificates"
+          :key="cert.id"
+          flat bordered
+          class="od-card"
+          style="width: 260px; cursor: pointer; transition: box-shadow 0.15s;"
+          @click="$router.push('/student/certificados')"
+        >
+          <q-card-section style="padding: 16px;">
+            <div class="row items-center q-mb-sm" style="gap: 8px;">
+              <q-icon name="workspace_premium" size="24px" style="color: var(--od-accent); flex-shrink: 0;" />
+              <div class="od-display ellipsis" style="font-size: 14px; font-weight: 600; color: var(--od-text-1);">
+                {{ cert.course_title }}
+              </div>
+            </div>
+            <div style="font-size: 12px; color: var(--od-text-4); margin-bottom: 4px;">
+              {{ cert.course_level }} · {{ cert.course_workload }}h
+            </div>
+            <div style="font-size: 11px; color: var(--od-text-5);">
+              Emitido em {{ formatDate(cert.issue_date) }} · {{ cert.code }}
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -188,6 +286,7 @@ import { profileService } from 'src/services/profile'
 import { stateService } from 'src/services/state'
 import { cityService } from 'src/services/city'
 import { courseService } from 'src/services/course'
+import { certificateService } from 'src/services/certificate'
 import { useAuth } from 'src/composables/useAuth'
 
 const $q = useQuasar()
@@ -218,6 +317,10 @@ const form = ref({
 const enrollments = ref([])
 const loadingCourses = ref(true)
 const inProgressCourses = computed(() => enrollments.value.filter(e => !e.is_completed))
+const completedCourses = computed(() => enrollments.value.filter(e => e.is_completed))
+
+const certificates = ref([])
+const loadingCertificates = ref(true)
 
 const inputStyle = 'border-radius: 8px;'
 
@@ -256,7 +359,7 @@ async function filterCities(val, update, abort) {
 
 
 onMounted(async () => {
-  await Promise.all([loadProfile(), loadStates(), loadEnrollments()])
+  await Promise.all([loadProfile(), loadStates(), loadEnrollments(), loadCertificates()])
 })
 
 async function loadEnrollments() {
@@ -269,6 +372,23 @@ async function loadEnrollments() {
   } finally {
     loadingCourses.value = false
   }
+}
+
+async function loadCertificates() {
+  loadingCertificates.value = true
+  try {
+    const resp = await certificateService.list()
+    certificates.value = resp.data.results ?? resp.data
+  } catch {
+    certificates.value = []
+  } finally {
+    loadingCertificates.value = false
+  }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  return new Date(dateStr).toLocaleDateString('pt-BR')
 }
 
 async function loadProfile() {

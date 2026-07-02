@@ -11,6 +11,7 @@ from allauth.socialaccount.models import SocialAccount
 from api.serializers import (
     AdminCourseSerializer,
     AdminUserSerializer,
+    CertificateSerializer,
     CitySerializer,
     CourseDetailSerializer,
     EnrollmentSerializer,
@@ -26,7 +27,7 @@ from api.serializers import (
     UserSerializer,
 )
 from api.throttles import RegisterThrottle, SocialAuthThrottle
-from course.models import Course, Lesson, LessonProgress, UserCourse
+from course.models import Certificate, Course, Lesson, LessonProgress, UserCourse
 from user.models import City, Profile, State, User
 
 
@@ -483,3 +484,20 @@ class StudentEnrollmentsView(generics.ListAPIView):
 
 
 student_enrollments = StudentEnrollmentsView.as_view()
+
+
+class CertificateListView(generics.ListAPIView):
+    serializer_class = CertificateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        profile, _ = Profile.objects.get_or_create(user=self.request.user)
+        return (
+            Certificate.objects
+            .select_related('course__teacher__profile')
+            .filter(profile=profile)
+            .order_by('-issue_date')
+        )
+
+
+certificate_list = CertificateListView.as_view()

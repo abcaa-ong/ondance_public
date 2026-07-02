@@ -5,7 +5,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from course.models import Course, Lesson, LessonProgress, Module, UserCourse
+from course.models import Certificate, Course, Lesson, LessonProgress, Module, UserCourse
 from user.models import City, Profile, State, User
 
 
@@ -436,6 +436,26 @@ class EnrollmentSerializer(serializers.ModelSerializer):
 class SaveProgressSerializer(serializers.Serializer):
     video_position = serializers.IntegerField(min_value=0, required=False)
     is_completed = serializers.BooleanField(required=False)
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    course_emoji = serializers.CharField(source='course.emoji', read_only=True)
+    course_thumb_bg = serializers.CharField(source='course.thumb_bg', read_only=True)
+    course_level = serializers.CharField(source='course.level', read_only=True)
+    course_workload = serializers.IntegerField(source='course.workload', read_only=True)
+    teacher_name = serializers.SerializerMethodField()
+
+    def get_teacher_name(self, obj):
+        return getattr(getattr(obj.course.teacher, 'profile', None), 'name', '') or obj.course.teacher.email
+
+    class Meta:
+        model = Certificate
+        fields = [
+            'id', 'code', 'course', 'course_title', 'course_emoji',
+            'course_thumb_bg', 'course_level', 'course_workload',
+            'teacher_name', 'issue_date', 'file',
+        ]
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
