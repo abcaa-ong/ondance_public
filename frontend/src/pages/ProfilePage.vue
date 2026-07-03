@@ -120,8 +120,8 @@
       </div>
     </div>
 
-    <!-- Cursos em andamento -->
-    <div class="q-mt-lg">
+    <!-- Cursos em andamento (somente aluno) -->
+    <div v-if="user?.role === 'aluno'" class="q-mt-lg">
       <div class="od-display" style="font-size: 18px; color: var(--od-text-1); margin-bottom: 12px;">Cursos em andamento</div>
 
       <div v-if="loadingCourses" class="row q-gutter-md">
@@ -178,8 +178,8 @@
       </div>
     </div>
 
-    <!-- Cursos concluídos -->
-    <div class="q-mt-lg">
+    <!-- Cursos concluídos (somente aluno) -->
+    <div v-if="user?.role === 'aluno'" class="q-mt-lg">
       <div class="od-display" style="font-size: 18px; color: var(--od-text-1); margin-bottom: 12px;">Cursos concluídos</div>
 
       <div v-if="loadingCourses" class="row q-gutter-md">
@@ -229,8 +229,8 @@
       </div>
     </div>
 
-    <!-- Certificados -->
-    <div class="q-mt-lg">
+    <!-- Certificados (somente aluno) -->
+    <div v-if="user?.role === 'aluno'" class="q-mt-lg">
       <div class="od-display" style="font-size: 18px; color: var(--od-text-1); margin-bottom: 12px;">Certificados</div>
 
       <div v-if="loadingCertificates" class="row q-gutter-md">
