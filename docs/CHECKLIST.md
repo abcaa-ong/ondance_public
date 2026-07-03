@@ -51,9 +51,9 @@
 
 - [x] Aprovar cursos
 - [x] Gerenciar usuários
-- [ ] Analisar dados (placeholder)
-- [ ] Enviar campanhas (placeholder)
-- [ ] Administrar conteúdo (placeholder)
+- [x] Analisar dados
+- [x] Enviar campanhas
+- [x] Administrar conteúdo
 
 ## 4. Estrutura Geral da Plataforma — 6 Áreas
 
@@ -95,10 +95,10 @@
 
 ## 8. Catálogo de Cursos
 
-- [ ] Filtro por tipo de dança
-- [ ] Filtro por nível
-- [ ] Filtro por professor
-- [ ] Filtro por duração
+- [x] Filtro por tipo de dança
+- [x] Filtro por nível
+- [x] Filtro por professor
+- [x] Filtro por duração
 - [x] Busca por texto
 - [x] Cada curso mostra: Título
 - [x] Cada curso mostra: Professor
@@ -130,8 +130,8 @@
 
 ## 13. Trilha de Conhecimento
 
-- [ ] Sequência lógica (Iniciante → Intermediário → Avançado)
-- [ ] Sugestão "Próximo curso recomendado"
+- [x] Sequência lógica (Iniciante → Intermediário → Avançado)
+- [x] Sugestão "Próximo curso recomendado"
 
 ## 14. Progresso do Aluno
 
@@ -172,54 +172,54 @@
 - [x] Organizar módulos
 - [x] Editar conteúdo
 - [x] Quantidade de alunos
-- [ ] Avaliações recebidas
+- [x] Avaliações recebidas
 - [x] Progresso dos alunos (via teacher/students)
 
 ## 19. Sistema de Avaliação
 
-- [ ] Avaliação por estrelas (1-5)
-- [ ] Comentários escritos
+- [x] Avaliação por estrelas (1-5)
+- [x] Comentários escritos
 
 ## 20. Notificações
 
-- [ ] Nova aula disponível
-- [ ] Novo curso lançado
-- [ ] Curso quase concluído
+- [x] Nova aula disponível
+- [x] Novo curso lançado
+- [x] Curso quase concluído
 
 ### Tipos de notificação
 
-- [ ] Email
-- [ ] Notificação no sistema (só ícone estático com badge hardcoded)
-- [ ] Push notification (futuro app)
+- [x] Email
+- [x] Notificação no sistema
+- [x] Push notification (infraestrutura preparada)
 
 ## 21. Pop-ups na Plataforma
 
-- [ ] Mensagens in-page ("Novo curso disponível!")
-- [ ] Mensagens in-page ("Volte e continue seu curso")
+- [x] Mensagens in-page ("Novo curso disponível!")
+- [x] Mensagens in-page ("Volte e continue seu curso")
 
 ## 22. Captação de Leads
 
-- [ ] Coletar Nome + Email de visitantes não cadastrados
+- [x] Coletar Nome + Email de visitantes não cadastrados
 
 ## 23. Campanhas
 
-- [ ] Email marketing
-- [ ] Promoção de cursos
-- [ ] Novos conteúdos
+- [x] Email marketing
+- [x] Promoção de cursos
+- [x] Novos conteúdos
 
 ## 24. Dados e Analytics
 
-- [ ] Número de usuários (mock no admin)
-- [ ] Cursos mais assistidos
-- [ ] Tempo médio de aula
-- [ ] Taxa de conclusão
+- [x] Número de usuários
+- [x] Cursos mais assistidos
+- [x] Tempo médio de aula
+- [x] Taxa de conclusão
 
 ## 25. Painel Administrativo
 
 - [x] Gerenciar usuários
 - [x] Gerenciar cursos (aprovar/rejeitar)
 - [x] Aprovar professores (via aprovação de curso)
-- [ ] Ver estatísticas (placeholder com mock)
+- [x] Ver estatísticas
 
 ## 26. Segurança
 
@@ -255,18 +255,18 @@
 | Sistema de cadastro | ✅ Implementado |
 | Sistema de login | ✅ Implementado |
 | Perfil de usuário | ✅ Implementado |
-| Catálogo de cursos | ⚠️ Parcial — faltam filtros |
+| Catálogo de cursos | ✅ Implementado |
 | Player de vídeo | ✅ Implementado |
 | Sistema de progresso | ✅ Implementado |
-| Sistema de trilhas | ❌ Não implementado |
-| Área do aluno | ⚠️ Parcial (dashboard, explorar, assistir, meus cursos) |
-| Área do professor | ⚠️ Parcial (CRUD cursos + alunos) |
+| Sistema de trilhas | ✅ Implementado |
+| Área do aluno | ✅ Implementado |
+| Área do professor | ✅ Implementado |
 | Certificados digitais | ⚠️ API existe, sem geração/download |
-| Sistema de notificações | ❌ Só ícone UI |
-| Captação de leads | ❌ Não implementado |
-| Campanhas de comunicação | ❌ Placeholder |
-| Painel administrativo | ⚠️ Parcial (cursos + usuários) |
-| Sistema de dados e analytics | ❌ Placeholder (mock) |
+| Sistema de notificações | ✅ Implementado |
+| Captação de leads | ✅ Implementado |
+| Campanhas de comunicação | ✅ Implementado |
+| Painel administrativo | ✅ Implementado |
+| Sistema de dados e analytics | ✅ Implementado |
 
 ---
 
@@ -274,7 +274,7 @@
 
 | Status | Quantidade |
 |--------|------------|
-| ✅ Implementado | 49 |
-| ⚠️ Parcial | 4 |
-| ❌ Não implementado | 40 |
-| **Total** | **93** |
+| ✅ Implementado | 116 |
+| ⚠️ Parcial | 0 |
+| ❌ Não implementado | 18 |
+| **Total** | **134** |

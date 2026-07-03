@@ -128,9 +128,9 @@
 - [x] Professor: gestão de aulas (trocar placeholder)
 - [x] Professor: ganhos/financeiro (trocar placeholder)
 - [ ] Revisão geral de UX e responsividade
-- [ ] Revisão geral de acessibilidade
-- [ ] Testes end-to-end dos fluxos principais
-- [ ] Documentação final das APIs
+- [x] Revisão geral de acessibilidade
+- [x] Testes end-to-end dos fluxos principais
+- [x] Documentação final das APIs
 - [ ] Preparação/marcações para fases futuras (marketplace, eventos, loja, festivais)
 
 **Itens do checklist atendidos:** Seção 26 (segurança), 20 (push), 29 (futuras expansões)
