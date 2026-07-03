@@ -16,6 +16,7 @@
         v-model="search"
         outlined dense
         placeholder="Buscar por título ou professor..."
+        aria-label="Buscar por título ou professor"
         style="min-width: 240px; flex: 1;"
         clearable
       >

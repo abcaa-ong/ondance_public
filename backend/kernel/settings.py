@@ -22,6 +22,7 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'corsheaders',
     'rest_framework',
+    'drf_spectacular',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -120,6 +121,15 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': (
         # 'rest_framework.permissions.IsAuthenticated',
     # )
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'OnDance API',
+    'DESCRIPTION': 'API da plataforma OnDance — cursos de dança da ABCAA',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': r'/api/',
 }
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

@@ -60,7 +60,7 @@
 
     <!-- User pill -->
     <div class="q-mt-auto q-pa-sm">
-      <div class="user-pill" @click="goToSettings">
+      <div class="user-pill" tabindex="0" role="button" @click="goToSettings" @keydown.enter="goToSettings" @keydown.space.prevent="goToSettings" :aria-label="`Configurações de ${user?.name || user?.email}`">
         <q-avatar size="34px" class="user-pill-avatar">
           {{ initials }}
         </q-avatar>
@@ -68,7 +68,7 @@
           <div class="user-pill-name">{{ user?.name || user?.email }}</div>
           <span class="user-role-badge" :class="`role--${user?.role}`">{{ roleLabel }}</span>
         </div>
-        <q-btn flat round dense icon="logout" size="xs" class="user-pill-logout" @click.stop="handleLogout" />
+        <q-btn flat round dense icon="logout" size="xs" class="user-pill-logout" @click.stop="handleLogout" aria-label="Sair" />
       </div>
     </div>
   </q-drawer>

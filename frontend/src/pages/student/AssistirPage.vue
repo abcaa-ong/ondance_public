@@ -82,6 +82,7 @@
               outlined dense
               type="textarea"
               placeholder="Deixe um comentário sobre esta aula..."
+              aria-label="Comentário sobre esta aula"
               rows="2"
               style="font-size: 13px;"
             />
@@ -249,6 +250,7 @@
               outlined dense
               type="textarea"
               placeholder="Deixe um comentário (opcional)"
+              aria-label="Comentário opcional sobre o curso"
               rows="3"
               class="q-mt-md"
               style="font-size: 13px;"

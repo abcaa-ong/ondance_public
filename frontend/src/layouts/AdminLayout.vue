@@ -3,12 +3,12 @@
 
     <q-header flat :style="{ background: 'var(--od-bg-surface)', borderBottom: '0.5px solid var(--od-border)' }">
       <q-toolbar style="height: 56px; padding: 0 24px;">
-        <q-btn flat round dense icon="menu" :style="{ color: 'var(--od-text-1)' }" class="lt-md" @click="toggleDrawer" />
+        <q-btn flat round dense icon="menu" :style="{ color: 'var(--od-text-1)' }" class="lt-md" @click="toggleDrawer" aria-label="Abrir menu" />
         <q-toolbar-title style="font-size: 0;" />
 
         <div class="row items-center" style="gap: 4px;">
-          <q-btn flat round dense icon="notifications_none" :style="{ color: 'var(--od-text-3)' }">
-            <q-badge floating color="negative" label="7" style="font-size:9px;" />
+          <q-btn flat round dense icon="notifications_none" :style="{ color: 'var(--od-text-3)' }" aria-label="Notificações">
+            <q-badge v-if="unreadCount > 0" floating color="negative" :label="unreadCount" style="font-size:9px;" aria-live="polite" />
           </q-btn>
           <q-btn
             flat round dense
@@ -18,7 +18,7 @@
           >
             <q-tooltip>{{ isDark ? 'Modo claro' : 'Modo escuro' }}</q-tooltip>
           </q-btn>
-          <q-btn flat round dense style="padding: 2px;">
+          <q-btn flat round dense style="padding: 2px;" :aria-label="`Menu do usuário ${userName}`">
             <q-avatar class="header-avatar">{{ userInitial }}</q-avatar>
             <q-menu anchor="bottom right" self="top right" :offset="[0, 8]" class="user-menu">
               <div class="user-menu-card">
@@ -55,11 +55,12 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AppSidebar from 'components/shared/AppSidebar.vue'
 import { useDarkMode } from 'src/composables/useDarkMode'
 import { useAuth } from 'src/composables/useAuth'
+import { api } from 'boot/axios'
 
 const sidebarRef = ref(null)
 function toggleDrawer() { sidebarRef.value?.toggle() }
@@ -67,6 +68,20 @@ function toggleDrawer() { sidebarRef.value?.toggle() }
 const { isDark, toggle: toggleDark } = useDarkMode()
 const { logout, user } = useAuth()
 const router = useRouter()
+
+const notifications = ref([])
+const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length)
+
+async function loadNotifications() {
+  try {
+    const resp = await api.get('/notifications/')
+    notifications.value = resp.data.results ?? resp.data ?? []
+  } catch {
+    // silently fail
+  }
+}
+
+onMounted(loadNotifications)
 
 const userName = computed(() => user.value?.name || user.value?.email || '')
 const userInitial = computed(() => {
