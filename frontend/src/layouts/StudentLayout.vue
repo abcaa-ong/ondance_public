@@ -7,8 +7,40 @@
         <q-toolbar-title style="font-size: 0;" />
 
         <div class="row items-center" style="gap: 4px;">
-          <q-btn flat round dense icon="notifications_none" :style="{ color: 'var(--od-text-3)' }" @click="showNotifications = true" aria-label="Notificações">
+          <q-btn flat round dense icon="notifications_none" :style="{ color: 'var(--od-text-3)' }" aria-label="Notificações">
             <q-badge v-if="unreadCount > 0" floating color="negative" :label="unreadCount" style="font-size:9px;" aria-live="polite" />
+            <q-menu anchor="bottom right" self="top right" :offset="[0, 8]" class="od-notification-menu" style="width: 360px; max-height: 480px;">
+              <div class="q-pa-md">
+                <div class="row items-center justify-between q-mb-md">
+                  <span style="font-size: 16px; font-weight: 600; color: var(--od-text-1);">Notificações</span>
+                  <q-btn v-if="unreadCount > 0" flat no-caps label="Marcar todas como lidas" size="sm" style="color: var(--od-accent);" @click="markAllRead" />
+                </div>
+                <div v-if="notifications.length === 0" class="text-center q-py-xl">
+                  <q-icon name="notifications_off" size="48px" style="color: var(--od-text-5);" />
+                  <p style="margin-top: 12px; color: var(--od-text-4); font-size: 13px;">Nenhuma notificação</p>
+                </div>
+                <div v-else class="column q-gutter-xs" style="overflow-y: auto; max-height: 380px;">
+                  <div
+                    v-for="n in notifications"
+                    :key="n.id"
+                    class="od-notification-item"
+                    :class="{ 'od-notification-item--unread': !n.is_read }"
+                    tabindex="0"
+                    role="button"
+                    @click="onNotificationClick(n)"
+                    @keydown.enter="onNotificationClick(n)"
+                    @keydown.space.prevent="onNotificationClick(n)"
+                  >
+                    <q-icon :name="notifIcon(n.type)" size="18px" :style="{ color: notifColor(n.type) }" style="flex-shrink: 0; margin-top: 2px;" />
+                    <div style="flex: 1; min-width: 0;">
+                      <div style="font-size: 13px; font-weight: 500; color: var(--od-text-1);">{{ n.title }}</div>
+                      <div v-if="n.message" style="font-size: 12px; color: var(--od-text-3); margin-top: 2px;">{{ n.message }}</div>
+                      <div style="font-size: 11px; color: var(--od-text-5); margin-top: 4px;">{{ formatNotifTime(n.created_at) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </q-menu>
           </q-btn>
           <q-btn
             flat round dense
@@ -54,40 +86,6 @@
         </transition>
       </router-view>
     </q-page-container>
-
-    <!-- Notification panel -->
-    <q-drawer v-model="showNotifications" side="right" :width="360" class="od-notification-drawer" aria-label="Notificações">
-      <div class="q-pa-md">
-        <div class="row items-center justify-between q-mb-md">
-          <span style="font-size: 16px; font-weight: 600; color: var(--od-text-1);">Notificações</span>
-          <q-btn v-if="unreadCount > 0" flat no-caps label="Marcar todas como lidas" size="sm" style="color: var(--od-accent);" @click="markAllRead" />
-        </div>
-        <div v-if="notifications.length === 0" class="text-center q-py-xl">
-          <q-icon name="notifications_off" size="48px" style="color: var(--od-text-5);" />
-          <p style="margin-top: 12px; color: var(--od-text-4); font-size: 13px;">Nenhuma notificação</p>
-        </div>
-        <div v-else class="column q-gutter-xs">
-          <div
-            v-for="n in notifications"
-            :key="n.id"
-            class="od-notification-item"
-            :class="{ 'od-notification-item--unread': !n.is_read }"
-            tabindex="0"
-            role="button"
-            @click="onNotificationClick(n)"
-            @keydown.enter="onNotificationClick(n)"
-            @keydown.space.prevent="onNotificationClick(n)"
-          >
-            <q-icon :name="notifIcon(n.type)" size="18px" :style="{ color: notifColor(n.type) }" style="flex-shrink: 0; margin-top: 2px;" />
-            <div style="flex: 1; min-width: 0;">
-              <div style="font-size: 13px; font-weight: 500; color: var(--od-text-1);">{{ n.title }}</div>
-              <div v-if="n.message" style="font-size: 12px; color: var(--od-text-3); margin-top: 2px;">{{ n.message }}</div>
-              <div style="font-size: 11px; color: var(--od-text-5); margin-top: 4px;">{{ formatNotifTime(n.created_at) }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </q-drawer>
 
     <WelcomeModal />
 
@@ -166,7 +164,6 @@ function handleLogout() {
 }
 
 // Notifications
-const showNotifications = ref(false)
 const notifications = ref([])
 const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length)
 
@@ -194,7 +191,6 @@ function onNotificationClick(n) {
     api.post('/notifications/mark-read/', { ids: [n.id] }).catch(() => {})
   }
   if (n.link) {
-    showNotifications.value = false
     router.push(n.link)
   }
 }
@@ -286,8 +282,11 @@ const navSections = [
   background: var(--od-accent); color: #fff;
   font-size: 13px; font-weight: 700;
 }
-.od-notification-drawer {
+.od-notification-menu {
   background: var(--od-bg-surface);
+  border: 1px solid var(--od-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 .od-notification-item {
   display: flex;
