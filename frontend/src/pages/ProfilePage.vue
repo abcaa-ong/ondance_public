@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="q-mb-lg">
       <div class="od-display" style="font-size: 24px; color: var(--od-text-1);">Meu Perfil</div>
-      <div class="od-display" style="font-size: 24px; color: var(--od-text-1);">Perfil do Aluno</div>
+      <div class="od-display" style="font-size: 24px; color: var(--od-text-1);">{{ roleLabel }}</div>
       <p style="color: var(--od-text-3); margin: 4px 0 0; font-size: 14px;">Gerencie suas informações pessoais</p>
     </div>
 
@@ -294,6 +294,9 @@ const router = useRouter()
 const { user } = useAuth()
 
 const roleHome = { admin: '/admin/overview', professor: '/teacher/dashboard', aluno: '/student/dashboard' }
+
+const roleLabels = { admin: 'Perfil do Administrador', professor: 'Perfil do Professor', aluno: 'Perfil do Aluno' }
+const roleLabel = computed(() => roleLabels[user.value?.role] || 'Meu Perfil')
 
 const fileInput = ref(null)
 const loading = ref(false)
