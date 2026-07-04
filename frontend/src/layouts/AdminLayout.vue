@@ -7,7 +7,7 @@
         <q-toolbar-title style="font-size: 0;" />
 
         <div class="row items-center" style="gap: 4px;">
-          <q-btn flat round dense icon="notifications_none" :style="{ color: 'var(--od-text-3)' }" aria-label="Notificações">
+          <q-btn v-if="user?.role !== 'admin'" flat round dense icon="notifications_none" :style="{ color: 'var(--od-text-3)' }" aria-label="Notificações">
             <q-badge v-if="unreadCount > 0" floating color="negative" :label="unreadCount" style="font-size:9px;" aria-live="polite" />
             <q-menu anchor="bottom right" self="top right" :offset="[0, 8]" class="od-notification-menu" style="width: 360px; max-height: 480px;">
               <div class="q-pa-md">
