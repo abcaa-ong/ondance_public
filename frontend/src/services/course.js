@@ -3,6 +3,7 @@ import { api } from 'boot/axios'
 export const courseService = {
   list() {
     return api.get('/courses/')
+    // http://localhost:8001/api/courses/
   },
 
   get(id) {

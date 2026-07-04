@@ -133,6 +133,7 @@ async function load () {
   loading.value = true
   try {
     const resp = await courseService.mine()
+    
     courses.value = resp.data.results ?? resp.data
   } catch {
     courses.value = []
